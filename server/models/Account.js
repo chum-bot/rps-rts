@@ -33,6 +33,9 @@ const AccountSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  battleLog: {
+    //type will be defined elsewhere
+  },
   createdDate: {
     type: Date,
     default: Date.now,
