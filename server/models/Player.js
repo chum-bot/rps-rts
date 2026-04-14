@@ -1,19 +1,30 @@
 const mongoose = require('mongoose');
+const Account = require('./Account.js');
+const Hand = require('./Hand.js');
+const Item = require('./Item.js');
 
 //schema for the player entity
 const PlayerSchema = new mongoose.Schema({
 
     account: {
         //type will be the account
+        //DOES THIS WORK I HAVE NO IDEA
+        type: Account,
+        required: true,
     },
+    //both hands are required because even if one dies i might add a consumable revive item at some point
     left: {
-        //type will be the hand
+        //type Hand
+        type: Hand,
+        required: true,
     },
     right: {
-        //type will be the hand
+        //type Hand
+        type: Hand,
+        required: true,
     },
     reserve: {
-        //type will be an array of the items you get (i'd have to make an Item thing...)
+        type: [Item], //i saw this syntax in the mongoose documentation so surely this just works
     },
     createdDate: {
         type: Date,

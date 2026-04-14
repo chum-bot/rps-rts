@@ -21,6 +21,7 @@ let AccountModel = {};
    characters), a password (actually the hashed version of the password created
    by bcrypt), and the created date.
 */
+
 const AccountSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -32,9 +33,6 @@ const AccountSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-  },
-  battleLog: {
-    //type will be defined elsewhere
   },
   createdDate: {
     type: Date,

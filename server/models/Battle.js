@@ -1,19 +1,31 @@
 const mongoose = require('mongoose');
+const Player = require('./Player.js');
 
 //schema for the battle entity
-//this will be used to update the account's battle log
-//when they run up a game, an empty Player that is assigned to an Account will be created
-//when the game ends, this entity is populated with the things that the Player had (their left/right hand loadout and their reserve)
-//and that entity is then saved to the player's log (do i let them choose if they wanna save it? i think so but that's more work)
+//this will be used to update the recent battles log that everybody will be able to see
+//it would be cool if i had a replay system but... scope creep...
+
+//so for my storage loop with this battle replay storing thing
+//when a player runs up a game, an empty Player assigned to an Account will be created (meaning 2 accounts per game)
+//each Player has a left and right Hand and an item reserve (Item[])
+//when the game ends, this entity is populated with who won and who lost the battle
+//and the ingame display will use all the info stored in the player
+//all of these entities are then displayed in the recent battles log
 const BattleSchema = new mongoose.Schema({
 
     winner: {
-        //type will be Player
+        //...i don't know how to save these as custom types.
+        //he said how to but i forgoooooooot
+        type: Player,
+        //uhhhhh does that work?
+        //i feel like it would no?
+        required: true,
     },
     loser: {
-        //type will be Player
+        type: Player,
+        required: true,
     },
-    createdDate: {
+    battleDate: {
         type: Date,
         default: Date.now,
     },
@@ -22,7 +34,7 @@ const BattleSchema = new mongoose.Schema({
 BattleSchema.statics.toAPI = (doc) => ({
     winner: doc.winner,
     loser: doc.loser,
-    reserve: doc.reserve,
+    battleDate: doc.battleDate,
 });
 
 const BattleModel = mongoose.model('Battle', BattleSchema);
