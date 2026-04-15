@@ -1,7 +1,7 @@
 const models = require('../models');
 const Battle =  models.Battle;
 
-//what to do when a battle resolves?
+//what to do when a battle resolves
 //take a request that has the winner and the loser (sent from the client)
 //create a battle object
 //.save() it to the database

@@ -11,11 +11,11 @@ const session = require('express-session');
 const RedisStore = require('connect-redis').RedisStore;
 const redis = require('redis');
 
-const router = require('./router.js');
-
+const router = require('./router.js')
+const socketSetup = require('./io.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://localhost/DomoMaker';
+const dbURI = process.env.MONGODB_URI || 'mongodb://localhost/Shoot'; //you know like rock paper scissors say shoot
 mongoose.connect(dbURI).catch((err) => {
     if(err) {
         console.log('Database connection failed');
@@ -42,7 +42,7 @@ app.use(session({
     store: new RedisStore({
         client: redisClient,
     }),
-    secret: 'Domo Arigato',
+    secret: 'rock paper scissors says shoot',
     resave: false,
     saveuninitialized: false
 }))
@@ -53,8 +53,11 @@ app.set('views', `${__dirname}/../views`);
 
 router(app);
 
-app.listen(port, (err) => {
-    if(err) {throw err; }
+const server = socketSetup(app);
+
+server.listen(port, (err) => {
+    if(err) throw err;
+
     console.log(`Listening on port ${port}`);
 });
 });
