@@ -39,7 +39,7 @@ const ItemSchema = new mongoose.Schema({
     effect: {
         //the item's activation function, the code that controls what it does
         //i want to have that in here so it's much easier to store and call upon/run them
-        //but... how?
+        //i don't even know if it makes sense to store functions in a database that sounds really weird and not right...
         type: { any: () => {} }, //does that work? mongoose did say i could make it anything i like... we'll see later
         required: true,
     },

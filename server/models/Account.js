@@ -6,6 +6,9 @@
 */
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const _ = require('underscore');
+
+function setName(name) { return _.escape(name).trim(); }
 
 /* When generating a password hash, bcrypt (and most other password hash
    functions) use a "salt". The salt is simply extra data that gets hashed
@@ -22,6 +25,9 @@ let AccountModel = {};
    by bcrypt), and the created date.
 */
 
+//so what purpose would an account have on this game?
+//flex your win/loss? a progression system? ...a progression system...
+
 const AccountSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -29,10 +35,23 @@ const AccountSchema = new mongoose.Schema({
     trim: true,
     unique: true,
     match: /^[A-Za-z0-9_\-.]{1,16}$/,
+    set: setName
   },
   password: {
     type: String,
     required: true,
+  },
+  wins: {
+    type: Number,
+    required: true,
+  },
+  losses: {
+    type: Number,
+    required: true,
+  },
+  trophies: { //a progression system
+    type: Number,
+    required: true
   },
   createdDate: {
     type: Date,
