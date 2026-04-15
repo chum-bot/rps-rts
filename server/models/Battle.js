@@ -5,8 +5,8 @@ const Player = require('./Player.js');
 //this will be used to update the recent battles log that everybody will be able to see
 //it would be cool if i had a replay system but... scope creep...
 
-//so for my storage loop with this battle replay storing thing
-//when a player runs up a game, an empty Player assigned to an Account will be created (meaning 2 accounts per game)
+//so for my storage loop with this battle result storing thing
+//when a player runs up a game, an empty Player (assigned to an Account) will be created (meaning 2 accounts per game)
 //each Player has a left and right Hand and an item reserve (Item[])
 //when the game ends, this entity is populated with who won and who lost the battle
 //and the ingame display will use all the info stored in the player

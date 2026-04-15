@@ -29,6 +29,31 @@ function login(req, res) {
     })
 }
 
+
+//a PUT request that updates two accounts
+//made once a battle ends
+//...i assume that there's a way to have it unified so that both players don't call this?
+//right? oh my god this is so overscoped
+function updateBattleInfo(req, res){
+    const winner = req.body.winner; //Account
+    const loser = req.body.loser; //Account
+
+    //my understanding of the clash royale trophy system, with 25 as a base instead of 30
+    //basically what cr does is it adds 1 trophy to your winnings per 10 extra trophies your opponent had on you
+    //and it does the opposite if you lose
+    //so for example if you had 30 trophies and you beat someone with 40, you would get 25 + 1 so 26 per this system
+    //and if you had 40 trophies and lost to someone with 30, you would lose 25 + 1 so 26
+    //BRO I HAVEN'T EVEN FIGURED OUT MATCHMAKING YET WHAT AM I DOING.
+
+    winner.trophies += 25 + ((loser.trophies - winner.trophies) / 10) 
+    winner.wins++;
+
+    loser.trophies -= 25 - ((winner.trophies - loser.trophies) / 10)
+    loser.losses++;
+
+    return res.status(204).json({message: 'WLT updated successfully'});
+}
+
 async function signup(req, res) {
     const username = `${req.body.username}`;
     const pass = `${req.body.pass}`;
@@ -44,7 +69,7 @@ async function signup(req, res) {
 
     try{
         const hash = await Account.generateHash(pass);
-        const newAccount = new Account({username, password: hash});
+        const newAccount = new Account({username, password: hash, wins: 0, losses: 0, trophies: 0}); //initializing wins/losses/trophies
         await newAccount.save();
         req.session.account = Account.toAPI(newAccount);
         return res.json({redirect: '/maker'});
@@ -63,5 +88,6 @@ module.exports = {
     loginPage, 
     login, 
     logout, 
-    signup
+    signup,
+    updateBattleInfo
 }
