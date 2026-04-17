@@ -3,7 +3,7 @@ const Player =  models.Player;
 const Hand = models.Hand;
 
 //player creation (do this for each user when they get in-game)
-//this object is also used for battle
+//used for battle and storing battles in the log
 async function createPlayer(req, res) {
     const account = req.body.account;
 
@@ -15,6 +15,7 @@ async function createPlayer(req, res) {
 
     const blankHand = {
         health: 5,
+        isDead: false, //just a flag the client can use for displaying death
     }
     const left = new Hand(blankHand);
     const right = new Hand(blankHand);
@@ -32,6 +33,23 @@ async function createPlayer(req, res) {
     }
 }
 
+//gets the created player object for use in battle
+//we'll make a hand controller for use with managing player hands
+//so you know, the whole core of the game which still doesn't exist yet!
+//client will determine winner and loser and send it as a fetch to the battle controller
+async function getPlayer(req, res) {
+    try{
+        const query = {account: req.session.account._id, active: true}; 
+        const docs = await Player.find(query).lean().exec();
+        return res.status(200).json({player: docs});
+    }
+    catch(err) {
+        console.log(err);
+        return res.status(500).json({error: "An error occurred when retrieving the player object."})
+    }
+}
+
 module.exports = {
     createPlayer,
+    getPlayer
 }

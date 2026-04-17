@@ -13,6 +13,10 @@ async function resolve(req, res) {
         winner, loser
     }
 
+    //when a battle resolves the players become inactive
+    winner.active = false;
+    loser.active = false;
+
     try{
         const newBattle = new Battle(battleData);
         await newBattle.save();
@@ -43,7 +47,7 @@ async function showBattles(req, res) {
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json("Something went wrong when retrieving all battles");
+        return res.status(500).json({error: "Something went wrong when retrieving all battles"});
     }
 }
 

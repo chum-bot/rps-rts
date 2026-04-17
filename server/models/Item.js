@@ -8,15 +8,14 @@ const emojiRegex = require('emoji-regex'); //emoji-regex npm library: https://ww
 //they have a function as their effect i would imagine (baseline for a functioning item but EVEN THIS COULD BE SCOPE CREEP.........)
 //they have a wearable that says what they are (glove bracelet ring, ez it's just an enum)
 
-
-//i'm cutting this functionality in the project because of scope creep
+//i'm cutting this functionality for the project because of scope creep
 //the code will stay tho, because i want to expand on this idea later
 //i plan to make the initial rock paper scissors doubles game
 //two hands, each with their own health, you can target each hand with rock paper or scissors
-//because i feel like that would be fine
+//because i feel like that would be fine and... doable... in the amount of time i have
 //we'd need the account stuff and the profit model and the subset of users thing so i'll look at that but
 //all these extra features gotta go
-//and completely scope out that whole "prep phase" insanity for now, because that sounds like way too much to complete and polish in... twelve days as of right now
+//completely scoping out that whole "prep phase" insanity for now, because that sounds like way too much to complete and polish in... twelve days as of right now
 const ItemSchema = new mongoose.Schema({
 
     name: {

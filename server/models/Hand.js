@@ -20,6 +20,10 @@ const HandSchema = new mongoose.Schema({
     glove: Item,
     bracelet: Item,
     ring: Item,
+    isDead: {
+        type: Boolean,
+        required: true,
+    },
     createdDate: {
         type: Date,
         default: Date.now,
@@ -31,6 +35,7 @@ HandSchema.statics.toAPI = (doc) => ({
     glove: doc.glove,
     bracelet: doc.bracelet,
     ring: doc.ring,
+    isDead: doc.isDead,
 });
 
 const HandModel = mongoose.model('Hand', HandSchema);
