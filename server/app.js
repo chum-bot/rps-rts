@@ -15,7 +15,7 @@ const router = require('./router.js')
 const socketSetup = require('./io.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://localhost/Shoot'; //you know like rock paper scissors say shoot
+const dbURI = process.env.MONGODB_URI || 'mongodb://localhost/Shoot'; //you know like rock paper scissors says shoot
 mongoose.connect(dbURI).catch((err) => {
     if(err) {
         console.log('Database connection failed');

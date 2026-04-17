@@ -29,11 +29,8 @@ function login(req, res) {
     })
 }
 
-
 //a PUT request that updates two accounts
 //made once a battle ends
-//...i assume that there's a way to have it unified so that both players don't call this?
-//right? oh my god this is so overscoped
 function updateBattleInfo(req, res){
     const winner = req.body.winner; //Account
     const loser = req.body.loser; //Account

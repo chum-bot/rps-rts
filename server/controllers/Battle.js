@@ -24,6 +24,30 @@ async function resolve(req, res) {
     }
 }
 
+//for the battle log page
+//gets all the battles
+//supports filtering by your wins and your losses, but idk if i'm putting that in. i still need to make the entire game. help.
+async function showBattles(req, res) {
+    try {
+        const showYourWins = req.query.showYourWins;
+        const showYourLosses = req.query.showYourLosses;
+        let query = {};
+        if(showYourWins) {
+            query = {winner: {account: req.session.account._id }} //you can check for your own battles
+        }
+        if(showYourLosses) {
+            query = {loser: {account: req.session.account._id }}
+        }
+        const docs = await Battle.find(query).lean().exec();
+        return res.status(200).json({battles: docs});
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json("Something went wrong when retrieving all battles");
+    }
+}
+
 module.exports = {
     resolve,
+    showBattles
 }
