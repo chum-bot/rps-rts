@@ -11,6 +11,17 @@ function router(app) {
     
     app.get('/logout', mid.requiresLogin, controllers.Account.logout);
 
+    app.post('/account', mid.requiresLogin, controllers.Account.updateBattleInfo);
+
+    app.post('/battles', mid.requiresLogin, controllers.Battle.resolve);
+    app.get('/battles', mid.requiresLogin, controllers.Battle.showBattles);
+
+    app.get('/players', mid.requiresLogin, controllers.Player.getPlayer);
+    app.post('/players', mid.requiresLogin, controllers.Player.createPlayer);
+
+    app.post('/damageHand', mid.requiresLogin, controllers.Hand.damageHand);
+
+
     app.get('/maker', mid.requiresLogin, controllers.Domo.makerPage);
     app.post('/maker', mid.requiresLogin, controllers.Domo.makeDomo);
 

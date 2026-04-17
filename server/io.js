@@ -53,10 +53,13 @@ function socketSetup(app) {
 
         //so what do we want?
         //we're not going to have a matchmaking system, it'll be private rooms for now
-        //two buttons, create room and join room
+        //two buttons after logging in, create room and join room
         //create room lets you make a room with an 8 digit room code
         //join room lets you enter a room code to join with
         //probably also a leave room button as well
+
+        //a way i can get the other player's info is when they join the room or something happens/changes, i just emit it to the room
+        //so everybody sees it ez wow amazing
 
         socket.on("create", (name) => handleRoomCreation(name, socket));
 
