@@ -77,13 +77,16 @@ async function signup(req, res) {
         if(err.code === 11000) {
             return res.status(400).json({error: "Username already in use!"});
         }
-        return res.status(500).json({errpr: "An error has occurred!"});
+        return res.status(500).json({error: "An error has occurred!"});
     }
 }
 
 async function getCurrentAccount(req, res) {
     try{
-        return res.status(200).json({accountId: req.session.account._id});
+        const query = {_id: req.session.account._id}
+        const docs = Account.find(query).select('username wins losses trophies _id').lean().exec();
+
+        return res.status(200).json(docs);
     }
     catch(err) {
         console.log(err);
