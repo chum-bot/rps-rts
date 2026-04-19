@@ -7,7 +7,7 @@ const Player = require('./Player.js');
 
 //so for my storage loop with this battle result storing thing
 //when a player runs up a game, an empty Player (assigned to an Account) will be created (meaning 2 accounts per game)
-//each Player has a left and right Hand and an item reserve (Item[])
+//each Player has a left and right Hand and an item reserve (Item[]) (we're scoping out items for now)
 //when the game ends, this entity is populated with who won and who lost the battle
 //and the ingame display will use all the info stored in the player
 //all of these entities are then displayed in the recent battles log

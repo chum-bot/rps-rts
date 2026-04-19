@@ -81,10 +81,21 @@ async function signup(req, res) {
     }
 }
 
+async function getCurrentAccount(req, res) {
+    try{
+        return res.status(200).json({accountId: req.session.account._id});
+    }
+    catch(err) {
+        console.log(err);
+        return res.status(500).json({error: 'something went wrong when fetching the current account'})
+    }
+}
+
 module.exports = {
     loginPage, 
     login, 
     logout, 
     signup,
-    updateBattleInfo
+    updateBattleInfo,
+    getCurrentAccount,
 }

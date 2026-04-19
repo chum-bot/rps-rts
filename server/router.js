@@ -11,6 +11,7 @@ function router(app) {
     
     app.get('/logout', mid.requiresLogin, controllers.Account.logout);
 
+    app.get('/account', mid.requiresLogin, controllers.Account.getCurrentAccount);
     app.post('/account', mid.requiresLogin, controllers.Account.updateBattleInfo);
 
     app.post('/battles', mid.requiresLogin, controllers.Battle.resolve);

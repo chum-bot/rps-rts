@@ -10,9 +10,17 @@ function handleRoomCreation(roomName, socket){
 }
 
 //if the room name they entered exists let em join it
+//or else... uhhhhhhhhh how do i handle errors here
+//emit it to the client that'll handle it
 function handleRoomJoin(roomName, socket){
     if(io.of("/").adapter.rooms[roomName]){
         socket.join(roomName);
+    }
+    else if(io.of("/").adapter.rooms[roomName].length === 2){ //room's full
+        socket.emit('full')
+    }
+    else {
+        socket.emit('nonexistent');//i can use this for error handling
     }
 }
 //leave a room when we want to leave a room

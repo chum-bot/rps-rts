@@ -26,7 +26,7 @@ let AccountModel = {};
 */
 
 //so what purpose would an account have on this game?
-//flex your win/loss? a progression system? ...a progression system...
+//flex your win/loss? a progression system? a progression system...
 
 const AccountSchema = new mongoose.Schema({
   username: {

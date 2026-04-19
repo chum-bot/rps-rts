@@ -1,4 +1,4 @@
-const handleError = (message) => {
+const handleError = (message) => { //change this to handle errors in our own way
   document.getElementById('errorMessage').textContent = message;
   document.getElementById('domoMessage').classList.remove('hidden');
 };
@@ -16,7 +16,6 @@ const sendPost = async (url, data, handler) => {
   });
 
   const result = await response.json();
-  document.getElementById('domoMessage').classList.add('hidden');
 
   if(result.redirect) {
     window.location = result.redirect;
@@ -31,12 +30,8 @@ const sendPost = async (url, data, handler) => {
   }
 };
 
-function hideError() {
-    document.getElementById('domoMessage').classList.add('hidden');
-}
 
 module.exports = {
     handleError, 
     sendPost,
-    hideError,
 }
