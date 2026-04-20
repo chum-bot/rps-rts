@@ -31,9 +31,6 @@ const sendPost = async (url, data, handler) => {
 
 //to begin a game, i need each user to create a Player for themselves, using the account they're signed into
 //meaning i need a current account looker, i can GET to account for that
-//...actually we don't need this because redis gives us the account id in the request anyway
-//i think we will need this for updating trophies and w/l ratio tho bc that's in mongo right
-//actually would we? once we fetched that we could also take the id from teh redis request...
 async function getAccount(){
     const response = await fetch('/account');
     const data = await response.json();

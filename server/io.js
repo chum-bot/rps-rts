@@ -7,7 +7,7 @@ let io;
 function handleRoomCreation(roomName, account, socket){
     socket.join(roomName); //should be more random or code-based or something, does not matter at all for now i just want functionality
     socket.data.account = account;
-    socket.to(roomName).emit('created', roomName);
+    io.to(roomName).emit('created', roomName, socket.data.account[0].username);
 }
 
 //if the room name they entered exists let em join it
@@ -36,24 +36,25 @@ function handleRoomCreation(roomName, account, socket){
 //but then i have to have that object in a place that both
 //wait sockets have an arbitrary data param
 //can't i just put the account into their current socket connection once they log in
-//and then these have access to all of the sockets in a room so it can just return the accounts they have in them
+//and then since these have access to all of the sockets in a room it can just return the accounts they have in them
 //bing bang boom account access? wow how wonderful. how stunning how amazing how stellar.
 //maybe i do stuff when the login goes through that gets their socket and places it in there
 
-function handleRoomJoin(roomName, socket){
+function handleRoomJoin(roomName, account, socket){
     if(io.of("/").adapter.rooms[roomName]){
         socket.join(roomName);
-        socket.to(roomName).emit('joined', roomName);
+        socket.data.account = account;
+        io.to(roomName).emit('joined', roomName, socket.data.account[0].username);
     }
     else if(io.of("/").adapter.rooms[roomName].length === 2){ 
         socket.emit('full'); //room's full
     }
     else {
-        socket.emit('nonexistent'); //i can use this for error handling
+        socket.emit('nonexistent'); //room's nonexistent
     }
 }
 //leave a room when we want to leave a room
-//(this leaves every room except their personal one, because i don't want to implement multi-room stuff like i really don't)
+//(this leaves every room except their personal one, because i don't want to implement checking for an individual room)
 function handleRoomLeave(socket) {
     socket.rooms.forEach(room => {
         if(room === socket.id) return;
@@ -72,6 +73,8 @@ function socketSetup(app) {
         //buuuuuuut i don't know how i would get socket to read the logins
         //each request has a session id right? stored in redis?
         //what if when a socket connects i read that? idk how i would read that tho
+        //also they would not stay in a room because socket ids are cleared on refresh
+        //so uh yeah nah
 
         socket.on('disconnect', () => {
             console.log('user disconnected');
@@ -94,6 +97,7 @@ function socketSetup(app) {
         //i have the redis req.session right
         //and that's put into account right
         //well that would be from the client request, which i can send into the server AND ASSOCIATE THE SOCKET WITH THE ACCOUNT ON CONNECTION!
+        //IF THE ACCOUNT IS ADDED ON CONNECTION (long as they're signed in), ANY ROOM THEY ENTER WILL HAVE THE ACCOUNT INFO IN IT!
         socket.on("create", (name, acc) => handleRoomCreation(name, acc, socket));
 
         socket.on('join', (name) => handleRoomJoin(name, socket));

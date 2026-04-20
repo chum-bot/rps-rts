@@ -8,13 +8,26 @@ const socket = io();
 //let's just list what i want to do and what i need to be able to do that
 
 //make the socket room
-function createRoom(e) {
+async function createRoom(e) {
     e.preventDefault();
     const roomName = e.target.querySelector('#roomName').value;
     if(!roomName){
         helper.handleError('A room name is required');
     }
-    socket.emit('create', roomName); //let io know it's gotta create the room
+    socket.emit('create', roomName, await helper.getAccount()); //let io know it's gotta create the room
+    const root = createRoot(document.getElementById('room')); //again i'm recreating the root just so i can re-render, this does not seem optimal...
+    root.render(<Room/>);
+}
+//join the socket room
+function joinRoom(e) {
+    e.preventDefault();
+    const roomName = e.target.querySelector('#roomName').value;
+    if(!roomName){
+        helper.handleError('A room name is required');
+    }
+    socket.emit('join', roomName); //let io know it's gotta add this socket to the room
+    const root = createRoot(document.getElementById('room')); //again i'm recreating the root just so i can re-render, this does not seem optimal...
+    root.render(<Room/>);
 }
 
 //if both room members have Players i should only need to call emit once on each of them, so they each emit their own Player to the room
@@ -29,6 +42,17 @@ function CreateRoomForm(props){
             <label htmlFor="roomName">Room Name: </label>
             <input type="text" name="roomName" id="roomName"/>
             <p id="inputInfo">This is the name people will enter to join your room.</p>
+            <input type="submit" value="Create Room"/>
+        </form>
+    );
+};
+function JoinRoomForm(props){
+    return(
+        <form action="" id="joinRoom" onSubmit={(e) => joinRoom(e)}>
+            <label htmlFor="roomName">Room Name: </label>
+            <input type="text" name="roomName" id="roomName"/>
+            <p id="inputInfo">Enter a room name to join.</p>
+            <input type="submit" value="Join Room"/>
         </form>
     );
 };
@@ -36,10 +60,8 @@ function CreateRoomForm(props){
 function Menu(props){
     return (
         <div>
-            <h1 id="title">DRPS*</h1>
-            <h4 id="subtitle">*doubles rock paper scissors</h4>
             <button id="createRoom" onClick={(e) => {dynamicListener(e, <CreateRoomForm/>)}}>Create Room</button>
-            <button id="joinRoom">Join Room</button>
+            <button id="joinRoom" onClick={(e) => {dynamicListener(e, <JoinRoomForm/>)}}>Join Room</button>
         </div>
     )
 }
@@ -50,24 +72,41 @@ function Menu(props){
 function Room (props){
     //when the room is created/a user joins the room, we want to give back the name
     //and the account that created it, so we can use that in the display and for the players themselves
-    let room = "";
-    socket.on('created', async (roomName) => { 
-        room = roomName;
-        const account = await helper.getAccount(); //i think imma send this back to io with a created event
-        socket.emit('created', {roomName, account})
+    let [room, setRoom] = useState('');
+    let [accounts, setAccounts] = useState([]);
+
+    let accounts = []; //i don't want to update this dynamically
+
+    socket.on('created', async (roomName, account) => {
+    
+        setRoom(roomName);
+        //nono because i have the ability to access my socket from here
+        //the function is io, so maybe i just have to use the same io syntax to get it?
+        //i might have to send it up from server tho... ykw that's just easier imma do that
+        setAccount(account);
+    });
+
+    socket.on('joined', async (account) => { //don't need the name to be sent back
+        //we're gonna get the other account and list its name here
+        //because look! there it is right there! as a parameter!
     });
 
     return (
         <div>
             <h1 id="roomTitle">Room {room}</h1>
+            <h2 id="users">Players:</h2>
+            
+            <p id="account">{account}</p>
             <button id="startGame">Start Game</button>
         </div>
     );
 }
 
 function dynamicListener(e, component) {
+    //but i'm recreating the root each time with this no?
+    //suboptimal, but i can't do it with init because the buttons are dynamic
+    //and i want them to be dynamic sooooo idk how else i'd do this for right now
     const root = createRoot(document.getElementById('room'));
-    console.log("hello?");
     e.preventDefault();
     root.render(component);
     return false;
