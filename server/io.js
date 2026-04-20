@@ -41,12 +41,13 @@ function handleRoomCreation(roomName, account, socket){
 //maybe i do stuff when the login goes through that gets their socket and places it in there
 
 function handleRoomJoin(roomName, account, socket){
-    if(io.of("/").adapter.rooms[roomName]){
+    const roomToJoin = io.of("/").adapter.rooms.get(roomName);
+    if(roomToJoin){
         socket.join(roomName);
         socket.data.account = account;
         io.to(roomName).emit('joined', roomName, socket.data.account[0].username);
     }
-    else if(io.of("/").adapter.rooms[roomName].length === 2){ 
+    else if(roomToJoin.size === 2){ 
         socket.emit('full'); //room's full
     }
     else {
@@ -100,7 +101,7 @@ function socketSetup(app) {
         //IF THE ACCOUNT IS ADDED ON CONNECTION (long as they're signed in), ANY ROOM THEY ENTER WILL HAVE THE ACCOUNT INFO IN IT!
         socket.on("create", (name, acc) => handleRoomCreation(name, acc, socket));
 
-        socket.on('join', (name) => handleRoomJoin(name, socket));
+        socket.on('join', (name, acc) => handleRoomJoin(name, acc, socket));
 
         socket.on('leave', () => handleRoomLeave(socket));
     });
