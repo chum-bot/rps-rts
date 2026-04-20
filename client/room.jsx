@@ -74,6 +74,9 @@ function Room (props){
     //and the account that created it, so we can use that in the display and for the players themselves
     let [room, setRoom] = useState('');
     let [accounts, setAccounts] = useState([]); //we'll use this after socket sends us back the other acc when it joins
+    //dude idk what you expected, obviously if you store the accounts in the client they won't update each other.
+    //i have to put the accounts into an array server-side, and send that back up as the react component
+    //a problem to be fixed another day
 
     socket.on('created', async (roomName, account) => {
     
