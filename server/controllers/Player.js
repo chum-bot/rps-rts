@@ -2,6 +2,8 @@ const models = require('../models');
 const Player =  models.Player;
 const Hand = models.Hand;
 
+
+
 //player creation (do this for each user when they get in-game)
 //used for battle and storing battles in the log
 async function createPlayer(req, res) {
@@ -35,7 +37,7 @@ async function createPlayer(req, res) {
 
 //gets the created player object for use in battle
 //we'll make a hand controller for use with managing player hands
-//so you know, the whole core of the game which still doesn't exist yet!
+//for you know, the whole core of the game which still doesn't exist yet!
 //client will determine winner and loser and send it as a fetch to the battle controller
 async function getPlayer(req, res) {
     try{
@@ -51,5 +53,5 @@ async function getPlayer(req, res) {
 
 module.exports = {
     createPlayer,
-    getPlayer
+    getPlayer,
 }

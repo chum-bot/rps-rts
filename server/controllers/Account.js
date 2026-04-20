@@ -25,7 +25,7 @@ function login(req, res) {
 
         req.session.account = Account.toAPI(account);
 
-        return res.json({redirect: '/maker'});
+        return res.json({redirect: '/room'});
     })
 }
 
@@ -34,6 +34,10 @@ function login(req, res) {
 function updateBattleInfo(req, res){
     const winner = req.body.winner; //Account
     const loser = req.body.loser; //Account
+
+    if(!winner || !loser) {
+        return res.status(400).json('Winner and loser reqired for battle log.');
+    }
 
     //my understanding of the clash royale trophy system, with 25 as a base instead of 30
     //basically what cr does is it adds 1 trophy to your winnings per 10 extra trophies your opponent had on you
@@ -69,7 +73,7 @@ async function signup(req, res) {
         const newAccount = new Account({username, password: hash, wins: 0, losses: 0, trophies: 0}); //initializing wins/losses/trophies
         await newAccount.save();
         req.session.account = Account.toAPI(newAccount);
-        return res.json({redirect: '/maker'});
+        return res.json({redirect: '/room'});
     }
 
     catch (err) {

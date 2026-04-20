@@ -12,11 +12,11 @@ const PlayerSchema = new mongoose.Schema({
     },
     //both hands are required because even if one dies i might add a consumable revive item at some point
     left: {
-        type: Hand,
+        type: Hand.HandSchema, //i THINK? this works?
         required: true,
     },
     right: {
-        type: Hand,
+        type: Hand.HandSchema,
         required: true,
     },
     // reserve: {
@@ -44,4 +44,7 @@ PlayerSchema.statics.toAPI = (doc) => ({
 
 const PlayerModel = mongoose.model('Player', PlayerSchema);
 
-module.exports = PlayerModel;
+module.exports = {
+    PlayerModel,
+    PlayerSchema
+};

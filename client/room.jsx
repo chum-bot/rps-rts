@@ -1,6 +1,3 @@
-//"And this! This is the game!"
-//god where do i start... i'm a little frazzled
-
 const helper = require('./helper.js');
 const React = require('react');
 const {useState, useEffect} = React;
@@ -10,8 +7,6 @@ const socket = io();
 
 //let's just list what i want to do and what i need to be able to do that
 
-
-
 //make the socket room
 function createRoom(e) {
     e.preventDefault();
@@ -19,7 +14,7 @@ function createRoom(e) {
     if(!roomName){
         helper.handleError('A room name is required');
     }
-    socket.emit('create', roomName); //let the socket know it's gotta handle room creation
+    socket.emit('create', roomName); //let io know it's gotta create the room
 }
 
 //if both room members have Players i should only need to call emit once on each of them, so they each emit their own Player to the room
@@ -38,16 +33,30 @@ function CreateRoomForm(props){
     );
 };
 
+function Menu(props){
+    return (
+        <div>
+            <h1 id="title">DRPS*</h1>
+            <h4 id="subtitle">*doubles rock paper scissors</h4>
+            <button id="createRoom" onClick={(e) => {dynamicListener(e, <CreateRoomForm/>)}}>Create Room</button>
+            <button id="joinRoom">Join Room</button>
+        </div>
+    )
+}
+
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
 //show the thingies right there on room join once it has them
 function Room (props){
     //when the room is created/a user joins the room, we want to give back the name
-    //and the account that created it, so we can use that in the display
+    //and the account that created it, so we can use that in the display and for the players themselves
     let room = "";
-    socket.on('created', (roomName) => { 
+    socket.on('created', async (roomName) => { 
         room = roomName;
+        const account = await helper.getAccount(); //i think imma send this back to io with a created event
+        socket.emit('created', {roomName, account})
     });
+
     return (
         <div>
             <h1 id="roomTitle">Room {room}</h1>
@@ -56,9 +65,17 @@ function Room (props){
     );
 }
 
+function dynamicListener(e, component) {
+    const root = createRoot(document.getElementById('room'));
+    console.log("hello?");
+    e.preventDefault();
+    root.render(component);
+    return false;
+}
+
 function init() {
-    const root = createRoot(document.getElementById('app'));
-    root.render(<CreateRoomForm/>);
+    const root = createRoot(document.getElementById('room'));
+    root.render(<Menu/>);
 };
 
 window.onload = init;

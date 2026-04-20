@@ -16,13 +16,14 @@ const BattleSchema = new mongoose.Schema({
     winner: {
         //...i don't know how to save these as custom types.
         //he said how to but i forgoooooooot
-        type: Player,
+        type: Player.PlayerSchema,
         //uhhhhh does that work?
         //i feel like it would no?
+        //it didn't, trying something else...
         required: true,
     },
     loser: {
-        type: Player,
+        type: Player.PlayerSchema,
         required: true,
     },
     battleDate: {

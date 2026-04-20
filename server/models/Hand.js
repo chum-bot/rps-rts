@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Item = require('./Item.js')
+//const Item = require('./Item.js')
 
 //schema for the hand entity
 //this is what the players are battling with
@@ -17,9 +17,10 @@ const HandSchema = new mongoose.Schema({
     //mongoose documentation said i can shorten em like this
     //and none of these are required because hands can have no items
     //meaning i can leave these when scoping out items
-    glove: Item,
-    bracelet: Item,
-    ring: Item,
+    //but i won't
+    //glove:  {any: Item},
+    //bracelet: {any: Player},
+    //ring:  {any: Player},
     isDead: {
         type: Boolean,
         required: true,
@@ -32,12 +33,15 @@ const HandSchema = new mongoose.Schema({
 
 HandSchema.statics.toAPI = (doc) => ({
     health: doc.health,
-    glove: doc.glove,
-    bracelet: doc.bracelet,
-    ring: doc.ring,
+    //glove: doc.glove,
+    //bracelet: doc.bracelet,
+    //ring: doc.ring,
     isDead: doc.isDead,
 });
 
 const HandModel = mongoose.model('Hand', HandSchema);
 
-module.exports = HandModel;
+module.exports = {
+    HandModel,
+    HandSchema //i need this i think
+};

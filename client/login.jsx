@@ -4,7 +4,6 @@ const {createRoot} = require('react-dom/client');
 
 function handleLogin(e){
     e.preventDefault();
-    helper.hideError();
 
     const username = e.target.querySelector('#user').value;
     const pass = e.target.querySelector('#pass').value;
@@ -19,7 +18,6 @@ function handleLogin(e){
 
 function handleSignup(e) {
     e.preventDefault();
-    helper.hideError();
 
     const username = e.target.querySelector('#user').value;
     const pass = e.target.querySelector('#pass').value;

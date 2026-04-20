@@ -4,10 +4,21 @@
 //we can let the client send us two hands and the throws of each
 //so two objects per player, each containing a Hand and a throw (rock paper or scissors)
 //post request so we're getting back a body
-//each client can send back one request for each of the hands they throw and the hand they target
+//each client can send back one request for each of the hands they throw and the hand they target with them
+//the full request would look like...
+/*
+    attacker: {
+        hand: Hand,
+        throw: 'rock' | 'paper' | 'scissors'
+    }
+    defender: {
+        hand: Hand,
+        throw: 'rock' | 'paper' | 'scissors'
+    }
+*/
 //meaning each request will have an attacker and a defender, and each turn will have four requests total.
 async function damageHand(req, res) {
-    const attacker = req.body.attacker; //{hand: Hand, throw: "rock | paper | scissors"}
+    const attacker = req.body.attacker;
     const defender = req.body.defender;
     if(!attacker || !defender) {
         return res.status(400).json('Attacker and defender required!'); 
@@ -22,7 +33,7 @@ async function damageHand(req, res) {
         ){
             defender.hand.health--;
             defender.hand.save();
-            //i can get each individual Player with a fetch (as would be needed by the game itself already)
+            //on the client i can get each individual Player with a fetch (as would be needed by the game itself already)
             //and send back the Hand object they select with the Hand object they target (both Hands are tracked with the Player)
             //that's entirely doable that sounds entirely doable
             //except maybe the defender bit i'm not too sure of how i would get the other player's Hand just yet
