@@ -83,15 +83,17 @@ function Room (props){
         setRoom(roomName);  
         //react is kind of annoying with this icl
         //why can't i just accounts.push why do i have to setAccounts and make a whole other array for that
+        console.log(account);
         setAccounts([
             ...accounts,
-            account.username
+            account
         ]);
     });
 
-    socket.on('joined', async (roomName, socketAccs) => { //don't need the name to be sent back
+    socket.on('joined', async (roomName, socketAccs) => {
         //we're gonna get the other account and list its name here
         //because look! there it is right there! as a parameter!
+        //actually changed this so io is directly sending me an array with the accounts in the room here
         setRoom(roomName);
         setAccounts(socketAccs);
     });
@@ -101,7 +103,7 @@ function Room (props){
         <div>
             <h1 id="roomTitle">Room {room}</h1>
             <h2 id="users">Players:</h2>
-            {accounts.map((acc) => <p className='accountName'>{acc}</p>)}
+            {accounts.map((acc) => <p className='accountName'>{acc.username}</p>)}
             <button id="startGame">Start Game</button>
         </div>
     );

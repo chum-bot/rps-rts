@@ -7,7 +7,7 @@ let io;
 function handleRoomCreation(roomName, account, socket){
     socket.join(roomName); //should be more random or code-based or something, does not matter at all for now i just want functionality
     socket.data.account = account;
-    io.to(roomName).emit('created', roomName, socket.data.account[0].username);
+    io.to(roomName).emit('created', roomName, socket.data.account[0]);
 }
 
 //if the room name they entered exists let em join it
