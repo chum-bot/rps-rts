@@ -85,17 +85,15 @@ function Room (props){
         //why can't i just accounts.push why do i have to setAccounts and make a whole other array for that
         setAccounts([
             ...accounts,
-            account
+            account.username
         ]);
     });
 
-    socket.on('joined', async (account) => { //don't need the name to be sent back
+    socket.on('joined', async (roomName, socketAccs) => { //don't need the name to be sent back
         //we're gonna get the other account and list its name here
         //because look! there it is right there! as a parameter!
-        setAccounts([
-            ...accounts,
-            account
-        ]);
+        setRoom(roomName);
+        setAccounts(socketAccs);
     });
     //now we have an array with both accounts
 

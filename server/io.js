@@ -40,12 +40,18 @@ function handleRoomCreation(roomName, account, socket){
 //bing bang boom account access? wow how wonderful. how stunning how amazing how stellar.
 //maybe i do stuff when the login goes through that gets their socket and places it in there
 
-function handleRoomJoin(roomName, account, socket){
+async function handleRoomJoin(roomName, account, socket){
     const roomToJoin = io.of("/").adapter.rooms.get(roomName);
     if(roomToJoin){
         socket.join(roomName);
         socket.data.account = account;
-        io.to(roomName).emit('joined', roomName, socket.data.account[0].username);
+        let socketAccs = [];
+        for(const soc of roomToJoin) {
+            const fullSocInstance = await io.in(soc).fetchSockets(); //getting the full socket instance from the id
+            socketAccs.push(fullSocInstance[0].data.account[0]);
+        }
+        console.log(socketAccs);
+        io.to(roomName).emit('joined', roomName, socketAccs);
     }
     else if(roomToJoin.size === 2){ 
         socket.emit('full'); //room's full
@@ -101,7 +107,7 @@ function socketSetup(app) {
         //IF THE ACCOUNT IS ADDED ON CONNECTION (long as they're signed in), ANY ROOM THEY ENTER WILL HAVE THE ACCOUNT INFO IN IT!
         socket.on("create", (name, acc) => handleRoomCreation(name, acc, socket));
 
-        socket.on('join', (name, acc) => handleRoomJoin(name, acc, socket));
+        socket.on('join', async (name, acc) => await handleRoomJoin(name, acc, socket));
 
         socket.on('leave', () => handleRoomLeave(socket));
     });
