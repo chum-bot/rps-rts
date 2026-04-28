@@ -65,7 +65,14 @@ function Menu(props){
         </div>
     )
 }
-
+function startGame(){
+    window.location.href = '/game' //temporary, i'll be doing a lot of stuff in here and having the redirect somewhere else
+    //i also have to handle both players pressing the button to ready up sooooooo yeah
+    //and redirecting them at the same time, probably after a timer delay
+    //ok theory confirmed, they disconnect instantly
+    //i have to associate the socket with a logged in account
+    //there's absolutely a way to do that, i just have to figure out how...
+}
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
 //show the thingies right there on room join once it has them
@@ -105,7 +112,7 @@ function Room (props){
             <h1 id="roomTitle">Room {room}</h1>
             <h2 id="users">Players:</h2>
             {accounts.map((acc) => <p className='accountName'>{acc.username}</p>)}
-            <button id="startGame">Start Game</button>
+            <button id="startGame" onClick={startGame}>Start Game</button>
         </div>
     );
 }

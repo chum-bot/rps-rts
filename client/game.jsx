@@ -57,4 +57,17 @@ function Game(props) {
     //and they would be separated, the clients don't need to see the same thing it'd be pretty easy to just make each one have themselves on the left and the enemy on the right
     //bc we'd have all the data in its own object
     //but before we do that i should test if redirecting to the /game page instantly refreshes the sockets and cooks us
+    return (
+        <div>
+            <h1 id="theGame">This is the Game!</h1>
+            <p>there isn't anything here i just have this to test the game redirect</p>
+        </div>
+    )
 }
+
+function init() {
+    const root = createRoot(document.getElementById('game'));
+    root.render(<Game/>);
+};
+
+window.onload = init;

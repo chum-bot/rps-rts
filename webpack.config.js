@@ -4,7 +4,8 @@ module.exports = {
     entry: {
         app: './client/game.jsx',
         login: './client/login.jsx',
-        room: './client/room.jsx'
+        room: './client/room.jsx',
+        game: './client/game.jsx'
     },
     module: {
         rules: [
