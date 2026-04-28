@@ -50,7 +50,6 @@ async function handleRoomJoin(roomName, account, socket){
             const fullSocInstance = await io.in(soc).fetchSockets(); //getting the full socket instance from the id
             socketAccs.push(fullSocInstance[0].data.account[0]);
         }
-        console.log(socketAccs);
         io.to(roomName).emit('joined', roomName, socketAccs);
     }
     else if(roomToJoin.size === 2){ 
@@ -68,6 +67,8 @@ function handleRoomLeave(socket) {
         socket.leave(room);
     });
 }
+
+
 
 function socketSetup(app) {
     const server = http.createServer(app);
@@ -105,11 +106,25 @@ function socketSetup(app) {
         //and that's put into account right
         //well that would be from the client request, which i can send into the server AND ASSOCIATE THE SOCKET WITH THE ACCOUNT ON CONNECTION!
         //IF THE ACCOUNT IS ADDED ON CONNECTION (long as they're signed in), ANY ROOM THEY ENTER WILL HAVE THE ACCOUNT INFO IN IT!
+
+
+        //ok let's do this on-connection thing first so i'm not bricked instantly
+        //ideally i would want something to give me the account info on connection but this isn't a traditional request is it
+        //here in io we only have the socket that just connected, we'd have to get the request from something else
+        //requiresLogin the middleware? that has the request in it and it needs that to log in
+        //so what if i nested an io.use in there with a socket in it that populated said socket with the account data
+        //that sounds like it'd make sense wait
+        //nvm there's an auth option. i can put it in there lol!
+
         socket.on("create", (name, acc) => handleRoomCreation(name, acc, socket));
 
         socket.on('join', async (name, acc) => await handleRoomJoin(name, acc, socket));
 
         socket.on('leave', () => handleRoomLeave(socket));
+
+        //i need a function that handles when an account wants to be created
+        //we already have both accounts here in io, stored as information linked to the socket
+        //but that's refreshed on refresh right? and that cooks me currently because the socket is refreshed on refresh
     });
 
     return server;

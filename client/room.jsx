@@ -77,6 +77,7 @@ function Room (props){
     //dude idk what you expected, obviously if you store the accounts in the client they won't update each other.
     //i have to put the accounts into an array server-side, and send that back up as the react component
     //a problem to be fixed another day
+    //that has already been fixed!
 
     socket.on('created', async (roomName, account) => {
     

@@ -50,6 +50,7 @@ function Game(props) {
     //the player object up there has the player in it
     //...but i need another player or else how are we doing any damage.
     //THIS IS THE MAIN SNAG. I NEED THE OTHER PLAYER IN ORDER TO DEAL ANY DAMAGE.
+    //I CAN GET IT
     //should i handle that in io?
     //really what i need is for io to give me the Player of the other user in the room
     //that would be perfect, bc then i can use that for enemy display pretty easily (it's the other socket, i can give it an id based on that)

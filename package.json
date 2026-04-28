@@ -1,5 +1,5 @@
 {
-  "name": "shoot",
+  "name": "drps",
   "version": "1.0.0",
   "description": "A rock paper scissors game, played with two hands.",
   "main": "./server/app.js",
