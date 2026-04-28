@@ -51,14 +51,10 @@ function Game(props) {
     //...but i need another player or else how are we doing any damage.
     //THIS IS THE MAIN SNAG. I NEED THE OTHER PLAYER IN ORDER TO DEAL ANY DAMAGE.
     //I CAN GET IT
-    //should i handle that in io?
-    //really what i need is for io to give me the Player of the other user in the room
-    //that would be perfect, bc then i can use that for enemy display pretty easily (it's the other socket, i can give it an id based on that)
-    //and i can send the requests to the damage controller that exists within... Hand, since that's what takes damage
-
-    //i think i have something for this
-    //but i'll look at it again tomorrow it's too late for me to think straight rn
-    //i'll tank the milestone deduction since i didn't even get the core function in
-    //also a lot of these comments are my in-the-moment thoughts that are entirely out of order and unlabeled
-    //i'll take em out when it's finished
+    //ok so we can retrieve the other player because we have the other account
+    //it's connected to the socket
+    //we can ask socket for the other account id, let it send it back to us, and then use that account id to grab the other player for display
+    //and they would be separated, the clients don't need to see the same thing it'd be pretty easy to just make each one have themselves on the left and the enemy on the right
+    //bc we'd have all the data in its own object
+    //but before we do that i should test if redirecting to the /game page instantly refreshes the sockets and cooks us
 }
