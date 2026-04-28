@@ -31,8 +31,14 @@ const sendPost = async (url, data, handler) => {
 
 //to begin a game, i need each user to create a Player for themselves, using the account they're signed into
 //meaning i need a current account looker, i can GET to account for that
-async function getAccount(){
-    const response = await fetch('/account');
+//updated it to get any account (for enemies)
+async function getAccount(accountId = ''){
+  let url = '/account'
+  if(accountId)
+    {
+      url += `?accountId=${accountId}`
+    }
+    const response = await fetch(url);
     const data = await response.json();
     if(!data) {
         handleError('Error retrieving account');

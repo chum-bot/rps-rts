@@ -68,18 +68,18 @@ function Menu(props){
 //creates the current player it needs to, with the accounts/sockets in the room
 //then sends an emit request to socket to check for each socket account's existence
 //and if both are there, load the game page for both players
-async function startGame(e){
+async function startGame(e, roomName){
     e.preventDefault();
     
     //i GET the current account
     const account = await helper.getAccount();
-    console.log(account)
     //i then call a POST to createPlayer, they send that back and i work with that for the games themselves
     await helper.sendPost('/players', {account: account[0]._id});
 
     //the player now exists for this account
     //which then means the Game can get the player for display
-    
+    //let io know a player is ready
+    socket.emit('ready', roomName);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -108,6 +108,13 @@ function Room (props){
         setRoom(roomName);
         setAccounts(socketAccs);
     });
+
+    //if both players are ready
+    socket.on('ready', () => {
+        const root = createRoot(document.getElementById('game'));
+        root.render(<Game/>);
+    })
+    
     //now we have an array with both accounts
 
     return (
@@ -115,47 +122,26 @@ function Room (props){
             <h1 id="roomTitle">Room {room}</h1>
             <h2 id="users">Players:</h2>
             {accounts.map((acc) => <p className='accountName'>{acc.username}</p>)}
-            <button id="startGame" onClick={startGame}>Start Game</button>
+            <button id="startGame" onClick={(e) => startGame(e, room)}>Start Game</button>
         </div>
     );
 }
-//GAME.JSX
-//this shall hold all of our actual game components and functionality
-//I SHOULD REALLY GET AT LEAST THIS WORKING FOR THE MILESTONE
-//this will take a lot longer so uh nah not right now
 
-//so what do we need
-//a Player for each Account (handled in the handlePlayer function, and getAccount handles... getting an account)
-//we need the visual display of what players are doing, which has: 
-//two hands, filled with information that is contained within Player
-//i would want to make a hand component probably, just to make things a bit easier?
-//we need the functionality of clicking a hand, selecting a throw, and selecting an opposing hand to target
-//but in order to do that we need the hands themselves
-//and in order to do that we need the player
-//which we have! but for one player.
-//noooooo ok wait
-//alright in order to actually manipulate the values i don't need to have them specifically send back the hand do i?
-//i can have the object they return send back their throw, and the target of either left or right!
-//because i have them listed as left and right right???
-//no i would still need the other hand anyway, to update its info
-//BUT WAIT CAN I GET IT FROM THE SERVER SIDE?
-//i'm thinking right
-//the only connection i have to the other player is via the socket right
-//what does the socket have in it tho? whatever i send to it? but i want to send server info BACK to it.
-
-function Game(props) {
+async function Game(props) {
     const [player, setPlayer] = useState({});
     const [opponent, setOpponent] = useState({});
 
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
+    //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(() => {
         async function loadPlayer() {
-            const response = await fetch('/player');
+            const response = await fetch('/players');
             const data = response.json();
             setPlayer(data.player);
         }
         loadPlayer();
     }, [props.updatePlayer]);
+
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
     //and i can get that by checking the only room the socket should be in (minus its personal one)
@@ -163,17 +149,25 @@ function Game(props) {
     //so we can setOpponent by getting that other player
     socket.emit('game time');
     socket.on('enemy', async (enem) => {
-        const response = await fetch(`/player?accountId=${enem}`)
+        const response = await fetch(`/players?accountId=${enem}`)
         const data = response.json();
         setOpponent(data.player);
     })
+
+    const playerUsername = await helper.getAccount(player.account).username;
+    const opponentUsername = await helper.getAccount(opponent.account).username;
     return (
         <div>
             <h1 id="theGame">This is the Game!</h1>
-            <h2 id="playerText">Player</h2>
             <div id="playerInfo">
+            <h2 id="playerText">{playerUsername} (You)</h2>
                 <p id="playerLeft">🫲 {player.left.health}</p>
                 <p id="playerRight">🫱 {player.right.health}</p>
+            </div>
+            <div id="opponentInfo">
+            <h2 id="opponentText">{opponentUsername} (Opponent)</h2>
+                <p id="opponentLeft">🫲 {opponent.left.health}</p>
+                <p id="opponentRight">🫱 {opponent.right.health}</p>
             </div>
         </div>
     )

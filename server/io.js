@@ -60,16 +60,31 @@ async function handleRoomJoin(roomName, account, socket){
     }
 }
 
+async function checkRoomReadiness(socket, roomName) {
+    socket.data.ready = true;
+    const roomToCheck = io.of("/").adapter.rooms.get(roomName);
+    for(const soc of roomToCheck) {
+        const fullSocInstance = await io.in(soc).fetchSockets();
+        if (fullSocInstance[0].data.ready && fullSocInstance[0].data.ready === false){
+            io.to(roomName).emit('not ready');
+            return;
+        }
+    }
+    console.log("this never ran which is a little concerning?")
+    io.to(roomName).emit('ready');
+}
+
 async function giveEnemy(socket) {
     let gameRoom;
     let enemy;
     //gimme the game room
     socket.rooms.forEach(room => {
         if(room === socket.id) return;
-        gameRoom = room;
+        gameRoom = io.of("/").adapter.rooms.get(room);
     });
     //gimme the other socket present in this game room
-    //(sockets disconnect on refresh right so there shouldn't be an issue where a room has more than 2 sockets i think)
+    //(sockets disconnect on refresh right so there shouldn't be an issue where a room has more than 2 sockets if someone dc's i think)
+    
     for (const soc of gameRoom){
         if (soc === socket) return;
         const fullSocInstance = await io.in(soc).fetchSockets();
@@ -87,8 +102,6 @@ function handleRoomLeave(socket) {
     });
 }
 
-
-
 function socketSetup(app) {
     const server = http.createServer(app);
     io = new Server(server);
@@ -102,6 +115,7 @@ function socketSetup(app) {
         //what if when a socket connects i read that? idk how i would read that tho
         //also they would not stay in a room because socket ids are cleared on refresh
         //so uh yeah nah
+        //i'll add this in a future implementation and work around it for now
 
         socket.on('disconnect', () => {
             console.log('user disconnected');
@@ -143,9 +157,7 @@ function socketSetup(app) {
 
         socket.on('game time', () => giveEnemy(socket));
 
-        //i need a function that handles when an account wants to be created
-        //we already have both accounts here in io, stored as information linked to the socket
-        //but that's refreshed on refresh right? and that cooks me currently because the socket is refreshed on refresh
+        socket.on('ready', (roomName) => checkRoomReadiness(socket, roomName));
     });
 
     return server;

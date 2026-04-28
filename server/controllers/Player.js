@@ -7,7 +7,6 @@ const { HandModel } = models.Hand;
 //player creation (do this for each user when they get in-game)
 //used for battle and storing battles in the log
 async function createPlayer(req, res) {
-    console.log(req.body);
     const account = req.body.account;
 
     if(!account) {
@@ -41,7 +40,7 @@ async function getPlayer(req, res) {
     try{
         const acc = req.query.accountId || req.session.account._id; //this works as a null checker right
         const query = {account: acc, active: true}; 
-        const docs = await Player.find(query).lean().exec();
+        const docs = await PlayerModel.find(query).lean().exec();
         return res.status(200).json({player: docs});
     }
     catch(err) {
