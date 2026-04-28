@@ -7,7 +7,7 @@ function requiresLogin(req, res, next) {
 
 function requiresLogout(req, res, next) {
     if(req.session.account) {
-        return res.redirect('/room');
+        return res.redirect('/game');
     }
     return next();
 }

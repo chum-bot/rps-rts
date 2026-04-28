@@ -19,7 +19,6 @@ function router(app) {
     app.get('/players', mid.requiresLogin, controllers.Player.getPlayer);
     app.post('/players', mid.requiresLogin, controllers.Player.createPlayer);
 
-    app.get('/room', mid.requiresLogin, controllers.Menu.roomPage);
     app.get('/game', mid.requiresLogin, controllers.Menu.gamePage);
 
     app.post('/damageHand', mid.requiresLogin, controllers.Hand.damageHand);

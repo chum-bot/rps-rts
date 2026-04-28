@@ -59,6 +59,25 @@ async function handleRoomJoin(roomName, account, socket){
         socket.emit('nonexistent'); //room's nonexistent
     }
 }
+
+async function giveEnemy(socket) {
+    let gameRoom;
+    let enemy;
+    //gimme the game room
+    socket.rooms.forEach(room => {
+        if(room === socket.id) return;
+        gameRoom = room;
+    });
+    //gimme the other socket present in this game room
+    //(sockets disconnect on refresh right so there shouldn't be an issue where a room has more than 2 sockets i think)
+    for (const soc of gameRoom){
+        if (soc === socket) return;
+        const fullSocInstance = await io.in(soc).fetchSockets();
+        enemy = fullSocInstance[0].data.account[0]._id;
+    }
+    socket.emit('enemy', enemy)
+    
+}
 //leave a room when we want to leave a room
 //(this leaves every room except their personal one, because i don't want to implement checking for an individual room)
 function handleRoomLeave(socket) {
@@ -121,6 +140,8 @@ function socketSetup(app) {
         socket.on('join', async (name, acc) => await handleRoomJoin(name, acc, socket));
 
         socket.on('leave', () => handleRoomLeave(socket));
+
+        socket.on('game time', () => giveEnemy(socket));
 
         //i need a function that handles when an account wants to be created
         //we already have both accounts here in io, stored as information linked to the socket

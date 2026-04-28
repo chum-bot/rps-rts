@@ -25,7 +25,7 @@ function login(req, res) {
 
         req.session.account = Account.toAPI(account);
 
-        return res.json({redirect: '/room'});
+        return res.json({redirect: '/game'});
     })
 }
 
@@ -73,7 +73,7 @@ async function signup(req, res) {
         const newAccount = new Account({username, password: hash, wins: 0, losses: 0, trophies: 0}); //initializing wins/losses/trophies
         await newAccount.save();
         req.session.account = Account.toAPI(newAccount);
-        return res.json({redirect: '/room'});
+        return res.json({redirect: '/game'});
     }
 
     catch (err) {
