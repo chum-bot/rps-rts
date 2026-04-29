@@ -163,10 +163,13 @@ function MainGame(props) {
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(async () => {
         setPlayer(await loadPlayer());
-        setPlayerUsername(await helper.getAccount(player.account).username)
         setOpponent(await loadOpponent(opponent.account));
-        setOpponentUsername(await helper.getAccount(opponent.account).username)
     }, [props.updatePlayers])
+
+    //I GOT IT oh my GOD i hate react
+    //ok now i gotta actually deal damage!
+    //i have a damage handler already, i just have to make a way to select it
+    //and when i do that i'll send a request over
 
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
@@ -188,7 +191,18 @@ function MainGame(props) {
                 <p id="opponentLeft">🫲 {opponent.left.health}</p>
                 <p id="opponentRight">🫱 {opponent.right.health}</p>
             </div>
-            <button id="reload" onClick={props.reload}>Reload button for testing</button>
+            <form action="/damageHand" method="post">
+                <select name="leftAttack" id="leftAttack">
+                    <option value="rock">👊</option>
+                    <option value="paper">🖐️</option>
+                    <option value="scissors">✌️</option>
+                </select>
+                <select name="leftTarget" id="leftTarget">
+                    <option value={opponent.left}>Left</option>
+                    <option value={opponent.right}>Right</option>
+                </select>
+            </form>
+            <button id="reload" onClick={() => props.reload()}>Reload button for testing</button>
         </div>
     )
 }
