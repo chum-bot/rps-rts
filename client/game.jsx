@@ -134,18 +134,12 @@ async function loadPlayer() {
     const response = await fetch('/players');
     const data = await response.json();
     console.log("RUN")
-    return data.player;
+    return data.player[0]; //it gives you an array
 }
 async function loadOpponent(enem) {
     const response = await fetch(`/players?accountId=${enem}`);
     const data = await response.json();
-    console.log(data) //ohhhhhhhhh i see.
-    //so on disconnect i should probably just kill the player object if it isn't part of a resolved battle
-    //the idea was that all of the resolved battles would persist
-    //ok i have found the root of the problem
-    //but how do i fix it now
-    //i wanted to connect to my local database via compass but when i get the compass connection it goes to the heroku one
-    return data.player;
+    return data.player[0]; //it gives you an array
 }
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
 //i really just wanna get the main game working before i look into that (activating the reverse cursed technique)

@@ -20,6 +20,7 @@ async function createPlayer(req, res) {
     const playerData = { account, left: new HandModel(blankHand), right: new HandModel(blankHand), active: true }
 
     try{
+        await PlayerModel.deleteMany({account: account}) //temporary! just for testing properly.
         const newPlayer = new PlayerModel(playerData);
         await newPlayer.save();
         return res.status(201).json(newPlayer); //creating a new resource
