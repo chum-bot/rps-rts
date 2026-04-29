@@ -119,14 +119,11 @@ function Room (props){
         const player = await loadPlayer();
         const playerInfo = accounts.find((acc) => acc.id === player.account);
         const enemInfo = accounts.find((acc) => acc.id !== player.account);
-        console.log(enemInfo)
         const enemy = await loadOpponent(enemInfo.id);
         const root = createRoot(document.getElementById('game'));
         root.render(<Game player={player} username={playerInfo.username} enemy={enemy} enemyUsername={enemInfo.username}/>);
     })
     
-    //now we have an array with both accounts
-
     return (
         <div>
             <h1 id="roomTitle">Room {room}</h1>
@@ -148,6 +145,36 @@ async function loadOpponent(enem) {
     return data.player; //it gives you an array
 }
 
+//the key here is i need the other user's throw before i run this
+//i can send that through io right, just shing it in and shing it back out?
+async function handleDamage(e, attacker, onDamage) {
+    //the hands themselves
+    const leftHand = attacker.left;
+    const rightHand = attacker.right;
+
+    //the throws of each hand (player)
+    const leftThrow = document.querySelector('#leftThrow').value;
+    const rightThrow = document.querySelector('#rightThrow').value;
+
+    //the Hands being targeted by the player
+    const leftTarget = document.querySelector('#leftTarget').value;
+    const rightTarget = document.querySelector('#rightTarget').value;
+
+    //each request will have an attacker and a defender
+    //i already hold the defender's hand in the target object, but i also need their throw
+    //which means i also need to make sure i have both throws before i send this
+    //each client is sending two requests, one from each hand
+    //i can use something similar to room readying to handle the opponent's throw
+    //except i need to differentiate which hand threw what at what time
+    //ig i can pass the handedness into io too can't i
+    //as one object, i can just do left: <throw>, right: <throw> when they send it, store it in the socket
+    //then when they both have choices in their sockets i pass them back into the client for parsing
+    //(do the same thing you did for the- wait how would i do that. how do i differentiate? oh i can put the socket in the array i pass back and .find it here)
+    //and then pass THAT into the handleDamage
+    //and then update the hands
+    //and repeat until dead! the loop is coming together finally
+}
+
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
 //i really just wanna get the main game working before i look into that
 //and that would still break room functionality bc the original socket is what's joining the room anyway
@@ -158,10 +185,6 @@ function MainGame(props) {
     const [playerUsername, setPlayerUsername] = useState(props.username);
     const [opponentUsername, setOpponentUsername] = useState(props.enemyUsername);
 
-    //in the startGame function that runs, i create the player and emit ready to the socket
-    //then on ready (also in the room), i render game in the root
-    //i could pass the player created to the ready emit, have io send it back as is, pass it through game as a prop, pass that through maingame as a prop, and then access it via props.player
-    //so it takes a throughline across all of my room stuff 
     
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
@@ -186,7 +209,6 @@ function MainGame(props) {
     //and sending back the *other* id (we already have our own id)
     //so we can setOpponent by getting that other player
     //this doesn't need to be in useEffect bc it'll run when the socket asks it to run
-
     return (
         <div>
             <h1 id="theGame">This is the Game!</h1>
@@ -200,7 +222,7 @@ function MainGame(props) {
                 <p id="opponentLeft">🫲 {opponent.left.health}</p>
                 <p id="opponentRight">🫱 {opponent.right.health}</p>
             </div>
-            <form action="/damageHand" method="post">
+            <form action="/damageHand" method="POST">
             <h2>Left Hand</h2>
                 <select name="leftThrow" id="leftThrow">
                     <option value="rock">👊</option>

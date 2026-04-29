@@ -60,6 +60,23 @@ async function handleRoomJoin(roomName, account, socket){
     }
 }
 
+function handleThrow(socket, choice) {
+    socket.data.choice = choice; //i find this to be the easiest way to store these
+    //i can probably just check socket.rooms for the other room instead of getting a specific name
+    //since they'd only be in 2 rooms anyway
+    let enemyChoice;
+    socket.rooms.forEach(async room => {
+        if(room === socket.id) return;
+        for(const soc of room) {
+            if(soc === socket.id) return;
+            const fullSocInstance = await io.in(soc).fetchSockets();
+            if(fullSocInstance[0].data.choice){ //if they have a choice, give it to me
+                enemyChoice = fullSocInstance[0].data.choice;
+            }
+        }
+    });
+}
+
 async function checkRoomReadiness(socket, roomName) {
     let player;
     let username;
@@ -155,7 +172,10 @@ function socketSetup(app) {
 
         socket.on('leave', () => handleRoomLeave(socket));
 
+        socket.on('throw', (choice) => handleThrow(socket, choice)); //throw is a keyword whoops
+
         socket.on('ready', (roomName) => checkRoomReadiness(socket, roomName));
+
     });
 
     return server;
