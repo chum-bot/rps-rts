@@ -60,26 +60,35 @@ async function handleRoomJoin(roomName, account, socket){
     }
 }
 
-async function checkRoomReadiness(socket, roomName, player, username) {
+async function checkRoomReadiness(socket, roomName) {
+    let player;
+    let username;
     let enemy;
     let enemyUsername;
     socket.data.ready = true;
     const roomToCheck = io.of("/").adapter.rooms.get(roomName);
 
-    //check if both players are ready
+    //check if both players are ready, and set their usernames properly here
+    //see the tricky thing here is
+    //opponents are from the perspective of only one account (the account that makes the room)
+    //because this is only 
     for(const soc of roomToCheck) {
         const fullSocInstance = await io.in(soc).fetchSockets();
+        console.log(soc);
+        if (soc === socket.id) {
+            player = fullSocInstance[0].data.account._id;
+            username = fullSocInstance[0].data.account.username;
+            console.log(`i am ${username}`)
+        }
+        else {
+            enemy = fullSocInstance[0].data.account._id;
+            enemyUsername = fullSocInstance[0].data.account.username;
+            console.log(`my enemy is ${enemyUsername}`)
+        }
         if (fullSocInstance[0].data.ready === undefined || fullSocInstance[0].data.ready === false){
             io.to(roomName).emit('not ready');
             return;
         }
-    }
-    //check the rooms again for the enemy and their username, and then emit it back to the server along with the player entities of each
-    for (const soc of roomToCheck){
-        if (soc === socket) return;
-        const fullSocInstance = await io.in(soc).fetchSockets();
-        enemy = fullSocInstance[0].data.account._id;
-        enemyUsername = fullSocInstance[0].data.account.username;
     }
     io.to(roomName).emit('ready', player, username, enemy, enemyUsername);
 }
@@ -137,7 +146,7 @@ function socketSetup(app) {
 
         socket.on('leave', () => handleRoomLeave(socket));
 
-        socket.on('ready', (roomName, player, username) => checkRoomReadiness(socket, roomName, player, username));
+        socket.on('ready', (roomName) => checkRoomReadiness(socket, roomName));
     });
 
     return server;

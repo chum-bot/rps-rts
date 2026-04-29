@@ -83,7 +83,7 @@ async function startGame(e, roomName){
     //which then means the Game can get the player for display
     //let io know a player is ready
     //i'm throughlining the account username too
-    socket.emit('ready', roomName, playerData.player, account.username);
+    socket.emit('ready', roomName);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -115,7 +115,8 @@ function Room (props){
 
     //if both players are ready
     //i'm gonna make both player entities here
-    socket.on('ready', async (player, username, enem, enemName) => {
+    socket.on('ready', async (play, username, enem, enemName) => {
+        const player = await loadPlayer();
         const enemy = await loadOpponent(enem);
         const root = createRoot(document.getElementById('game'));
         root.render(<Game player={player} username={username} enemy={enemy} enemyUsername={enemName}/>);
@@ -136,12 +137,12 @@ function Room (props){
 async function loadPlayer() {
     const response = await fetch('/players');
     const data = await response.json();
-    return data.player;
+    return data.player; //it gives you an array
 }
 async function loadOpponent(enem) {
     const response = await fetch(`/players?accountId=${enem}`);
     const data = await response.json();
-    return data.player;
+    return data.player; //it gives you an array
 }
 
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
@@ -162,9 +163,11 @@ function MainGame(props) {
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(async () => {
-        console.log(props.enemy);
         setPlayer(await loadPlayer());
         setOpponent(await loadOpponent(opponent.account));
+        const playAcc = await helper.getAccount();
+        const oppAcc = await helper.getAccount(opponent.account);
+        console.log(props.enemy)
         setPlayerUsername(playAcc.username)
         setOpponentUsername(oppAcc.username)
     }, [props.updatePlayers])
@@ -217,7 +220,6 @@ function MainGame(props) {
                 </select>
                 <input type="submit" value="Attack!"/>
             </form>
-            <button id="reload" onClick={() => props.reload()}>Reload button for testing</button>
         </div>
     )
 }
