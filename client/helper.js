@@ -44,6 +44,7 @@ async function getAccount(accountId = ''){
         handleError('Error retrieving account');
         return false;
     }
+    console.log(data.username)
     return data;
 }
 

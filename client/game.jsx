@@ -83,7 +83,7 @@ async function startGame(e, roomName){
     //which then means the Game can get the player for display
     //let io know a player is ready
     //i'm throughlining the account username too
-    socket.emit('ready', roomName, playerData.player[0], account.username);
+    socket.emit('ready', roomName, playerData.player, account.username);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -136,12 +136,12 @@ function Room (props){
 async function loadPlayer() {
     const response = await fetch('/players');
     const data = await response.json();
-    return data.player[0]; //it gives you an array
+    return data.player;
 }
 async function loadOpponent(enem) {
     const response = await fetch(`/players?accountId=${enem}`);
     const data = await response.json();
-    return data.player[0]; //it gives you an array
+    return data.player;
 }
 
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
@@ -162,11 +162,11 @@ function MainGame(props) {
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(async () => {
+        console.log(props.enemy);
         setPlayer(await loadPlayer());
-        console.log(await helper.getAccount().username) //brother how is it undefined. i can literally SEE it RIGHT IN THE OBJECT
-        setPlayerUsername(await helper.getAccount().username)
         setOpponent(await loadOpponent(opponent.account));
-        setOpponentUsername(await helper.getAccount(opponent.account).username)
+        setPlayerUsername(playAcc.username)
+        setOpponentUsername(oppAcc.username)
     }, [props.updatePlayers])
 
     //I GOT IT oh my GOD i hate react
