@@ -61,8 +61,12 @@ async function handleRoomJoin(roomName, account, socket){
 }
 
 async function checkRoomReadiness(socket, roomName, player, username) {
+    let enemy;
+    let enemyUsername;
     socket.data.ready = true;
     const roomToCheck = io.of("/").adapter.rooms.get(roomName);
+
+    //check if both players are ready
     for(const soc of roomToCheck) {
         const fullSocInstance = await io.in(soc).fetchSockets();
         if (fullSocInstance[0].data.ready === undefined || fullSocInstance[0].data.ready === false){
@@ -70,27 +74,14 @@ async function checkRoomReadiness(socket, roomName, player, username) {
             return;
         }
     }
-    io.to(roomName).emit('ready', player, username);
-}
-
-async function giveEnemy(socket) {
-    let gameRoom;
-    let enemy;
-    //gimme the game room
-    socket.rooms.forEach(room => {
-        if(room === socket.id) return;
-        gameRoom = io.of("/").adapter.rooms.get(room);
-    });
-    //gimme the other socket present in this game room
-    //(sockets disconnect on refresh right so there shouldn't be an issue where a room has more than 2 sockets if someone dc's i think)
-    
-    for (const soc of gameRoom){
+    //check the rooms again for the enemy and their username, and then emit it back to the server along with the player entities of each
+    for (const soc of roomToCheck){
         if (soc === socket) return;
         const fullSocInstance = await io.in(soc).fetchSockets();
         enemy = fullSocInstance[0].data.account[0]._id;
+        enemyUsername = fullSocInstance[0].data.account[0].username;
     }
-    socket.emit('enemy', enemy)
-    
+    io.to(roomName).emit('ready', player, username, enemy, enemyUsername);
 }
 //leave a room when we want to leave a room
 //(this leaves every room except their personal one, because i don't want to implement checking for an individual room)
@@ -138,23 +129,13 @@ function socketSetup(app) {
         //and that's put into account right
         //well that would be from the client request, which i can send into the server AND ASSOCIATE THE SOCKET WITH THE ACCOUNT ON CONNECTION!
         //IF THE ACCOUNT IS ADDED ON CONNECTION (long as they're signed in), ANY ROOM THEY ENTER WILL HAVE THE ACCOUNT INFO IN IT!
-
-
-        //ok let's do this on-connection thing first so i'm not bricked instantly
-        //ideally i would want something to give me the account info on connection but this isn't a traditional request is it
-        //here in io we only have the socket that just connected, we'd have to get the request from something else
-        //requiresLogin the middleware? that has the request in it and it needs that to log in
-        //so what if i nested an io.use in there with a socket in it that populated said socket with the account data
-        //that sounds like it'd make sense wait
-        //nvm there's an auth option. i can put it in there lol!
+        //but the socket is still refreshed on refresh so that wouldn't matter would it
 
         socket.on("create", (name, acc) => handleRoomCreation(name, acc, socket));
 
         socket.on('join', async (name, acc) => await handleRoomJoin(name, acc, socket));
 
         socket.on('leave', () => handleRoomLeave(socket));
-
-        socket.on('game time', () => giveEnemy(socket));
 
         socket.on('ready', (roomName, player, username) => checkRoomReadiness(socket, roomName, player, username));
     });
