@@ -76,10 +76,12 @@ async function startGame(e, roomName){
     //i then call a POST to createPlayer, they send that back and i work with that for the games themselves
     await helper.sendPost('/players', {account: account[0]._id});
 
+    //i get the player that was just made to send it back
+    const player = await fetch('/players'); 
     //the player now exists for this account
     //which then means the Game can get the player for display
     //let io know a player is ready
-    socket.emit('ready', roomName);
+    socket.emit('ready', roomName, player);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -110,9 +112,10 @@ function Room (props){
     });
 
     //if both players are ready
-    socket.on('ready', () => {
+    //i'm gonna make both player entities here
+    socket.on('ready', (player) => {
         const root = createRoot(document.getElementById('game'));
-        root.render(<Game/>); //so it updates instantly? i guess? i gotta load in the player
+        root.render(<Game player={player}/>);
     })
     
     //now we have an array with both accounts
@@ -127,6 +130,23 @@ function Room (props){
     );
 }
 
+async function loadPlayer() {
+    const response = await fetch('/players');
+    const data = await response.json();
+    console.log("RUN")
+    return data.player;
+}
+async function loadOpponent(enem) {
+    const response = await fetch(`/players?accountId=${enem}`);
+    const data = await response.json();
+    console.log(data) //ohhhhhhhhh i see.
+    //so on disconnect i should probably just kill the player object if it isn't part of a resolved battle
+    //the idea was that all of the resolved battles would persist
+    //ok i have found the root of the problem
+    //but how do i fix it now
+    //i wanted to connect to my local database via compass but when i get the compass connection it goes to the heroku one
+    return data.player;
+}
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
 //i really just wanna get the main game working before i look into that (activating the reverse cursed technique)
 //and that would still break room functionality bc the original socket is what's joining the room anyway
@@ -140,35 +160,42 @@ function MainGame(props) {
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     //this has to run though.
-    //COME ON JUST RUNNNNN PLEASE
-    socket.emit('game time');
-    useEffect(() => {
-        async function loadPlayer() {
-            const response = await fetch('/players');
-            const data = response.json();
-            setPlayer(data.player);
-            setPlayerUsername(await helper.getAccount(data.player.account).username)
-            console.log("did you run?")
-        }
-        async function loadOpponent(enem) {
-            const response = await fetch(`/players?accountId=${enem}`)
-            const data = response.json();
-            setOpponent(data.player);
-            setOpponentUsername(await helper.getAccount(data.player.account).username)
-        }
-        loadPlayer();
-        socket.on('enemy', async (enem) => {
-            await loadOpponent(enem);
-            console.log("did YOU run?")
-        })
+    useEffect(async () => {
+        setPlayer(await loadPlayer());
+        setPlayerUsername(await helper.getAccount(player.account).username)
+        console.log('testing something?')
     }, [props.updatePlayers])
+    socket.emit('game time');
 
-    props.reload();
+    //i need this to load instantly
+    //but because i'm not loading a new page (i can't bc of socket io room reasons), useEffect doesn't run when i get here
+    //so i need to run this instantly ELSEwhere, and then pass it in here
+    //i can't make this MainGame function async to run await loadPlayer here, because then it infinitely loops on me
+    //i essentially have to pass in the initial player and opponent as props
+    //maybe i can do that when i load game on room ready?
+    //and run load player up there? bc i know it'll run over there?
+    //maybe i set it when the socket comes back? but i don't think that's instant tho ideally it exists before the page loads
+    //i think i do both
+    //in the startGame function that runs, i create the player and emit ready to the socket
+    //then on ready (also in the room), i render game in the root
+    //i could pass the player created to the ready emit, have io send it back as is, pass it through game as a prop, pass that through maingame as a prop, and then access it via props.player
+    //so it takes a throughline across all of my room stuff 
+    console.log(props.player);
+    setPlayer(props.player)
+    setPlayerUsername(props.player.account) //but i need an async to get the username here.
+
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
     //and i can get that by checking the only room the socket should be in (minus its personal one)
     //and sending back the *other* id (we already have our own id)
     //so we can setOpponent by getting that other player
+    //this doesn't need to be in useEffect bc it'll run when the socket asks it to run
+    socket.on('enemy', async (enem) => {
+        setOpponent(await loadOpponent(enem));
+        setOpponentUsername(await helper.getAccount(opponent.account).username)
+    })
+
+    if(opponent && player){
     return (
         <div>
             <h1 id="theGame">This is the Game!</h1>
@@ -185,6 +212,7 @@ function MainGame(props) {
             <button id="reload" onClick={props.reload}>Reload button for testing</button>
         </div>
     )
+    }
 }
 
 function dynamicListener(e, component) {
@@ -198,11 +226,11 @@ function dynamicListener(e, component) {
 }
 
 //an overseer type function that'll essentially hold all of the game's props
-function Game() {
+function Game(props) {
     const [playerUpdate, setPlayerUpdate] = useState(false);
 
     return(
-        <MainGame reload={() => {setPlayerUpdate(!playerUpdate)}} updatePlayers={playerUpdate}/>
+        <MainGame reload={() => {setPlayerUpdate(!playerUpdate)}} updatePlayers={playerUpdate} player={props.player}/>
     )
 }
 

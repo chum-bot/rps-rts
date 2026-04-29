@@ -2,8 +2,6 @@ const models = require('../models');
 const { PlayerModel } =  models.Player;
 const { HandModel } = models.Hand;
 
-
-
 //player creation (do this for each user when they get in-game)
 //used for battle and storing battles in the log
 async function createPlayer(req, res) {
