@@ -208,7 +208,6 @@ async function handleDamage(e, attacker, defender) {
     });
     //and then update the hands (which should happen automatically, right react?)
     //wrong! i hate react.
-    //and repeat until dead! the loop is coming together finally
 }
 
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
@@ -314,3 +313,20 @@ function init() {
 };
 
 window.onload = init;
+
+//yeah no. this is my white flag, my final stand, my sigh of defeat.
+//my grade tanks it i think? but it'll take a giant chunk out of me
+//idk if it'll even be enough for me to make it out of this semester
+//this... extremely, extremely important semester.
+//i'm just stupid i'm just dumb i just hate everything related to success and logic
+//i'm just not cut out for doing anything, because my time is less important than whatever nonsense i'd waste it on
+//i hate myself i hate these decisions i've made
+//i'm just physically and mentally incapable of doing anything of reasonable value to myself
+//i get a hat later but i don't even know if i'll be allowed to walk
+//my whole family will come and watch... nothing, because i failed them and i failed myself
+//i hate this aspect of myself so, so much
+//my chronic and inexcusable lack of any and all concepts of time management
+//i know things are coming up and i blatantly ignore them! what is wrong with me??
+//just- whatever. whatever
+//the time has passed, it's over.
+//i don't deserve that hat, whether i get it or not i do not deserve to stand among those others
