@@ -72,9 +72,14 @@ function handleThrow(socket, choice) {
             const fullSocInstance = await io.in(soc).fetchSockets();
             if(fullSocInstance[0].data.choice){ //if they have a choice, give it to me
                 enemyChoice = fullSocInstance[0].data.choice;
+                const throws = {};
+                throws[socket.id] = choice;
+                throws[soc] = enemyChoice;
+                io.to(room).emit('throws', throws)
             }
         }
     });
+    
 }
 
 async function checkRoomReadiness(socket, roomName) {

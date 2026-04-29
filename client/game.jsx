@@ -160,6 +160,7 @@ async function handleDamage(e, attacker, onDamage) {
     const leftTarget = document.querySelector('#leftTarget').value;
     const rightTarget = document.querySelector('#rightTarget').value;
 
+
     //each request will have an attacker and a defender
     //i already hold the defender's hand in the target object, but i also need their throw
     //which means i also need to make sure i have both throws before i send this
@@ -168,8 +169,14 @@ async function handleDamage(e, attacker, onDamage) {
     //except i need to differentiate which hand threw what at what time
     //ig i can pass the handedness into io too can't i
     //as one object, i can just do left: <throw>, right: <throw> when they send it, store it in the socket
+    socket.emit('throw', {left: leftThrow, right: rightThrow})
     //then when they both have choices in their sockets i pass them back into the client for parsing
     //(do the same thing you did for the- wait how would i do that. how do i differentiate? oh i can put the socket in the array i pass back and .find it here)
+    socket.on('throws', async (throws) => {
+        const playerThrows = throws[socket.id]; //object indexing should work here bc i listed it by socket
+        const keys = Object.keys(throws).filter((ki) => ki !== socket.id)
+        const enemyThrows = throws[keys[0]] //...the other one.
+    })
     //and then pass THAT into the handleDamage
     //and then update the hands
     //and repeat until dead! the loop is coming together finally
