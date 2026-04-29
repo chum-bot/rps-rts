@@ -114,12 +114,15 @@ function Room (props){
     });
 
     //if both players are ready
-    //i'm gonna make both player entities here
-    socket.on('ready', async (play, username, enem, enemName) => {
+    //i'm gonna load in both player entities here
+    socket.on('ready', async (accounts) => {
         const player = await loadPlayer();
-        const enemy = await loadOpponent(enem);
+        const playerInfo = accounts.find((acc) => acc.id === player.account);
+        const enemInfo = accounts.find((acc) => acc.id !== player.account);
+        console.log(enemInfo)
+        const enemy = await loadOpponent(enemInfo.id);
         const root = createRoot(document.getElementById('game'));
-        root.render(<Game player={player} username={username} enemy={enemy} enemyUsername={enemName}/>);
+        root.render(<Game player={player} username={playerInfo.username} enemy={enemy} enemyUsername={enemInfo.username}/>);
     })
     
     //now we have an array with both accounts

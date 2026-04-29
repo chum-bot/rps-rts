@@ -78,7 +78,6 @@ async function checkRoomReadiness(socket, roomName) {
         if (soc === socket.id) {
             player = fullSocInstance[0].data.account._id;
             username = fullSocInstance[0].data.account.username;
-            console.log(`i am ${username}`)
         }
         else {
             enemy = fullSocInstance[0].data.account._id;
@@ -90,7 +89,17 @@ async function checkRoomReadiness(socket, roomName) {
             return;
         }
     }
-    io.to(roomName).emit('ready', player, username, enemy, enemyUsername);
+    console.log(`i am ${username} and my enemy is ${enemyUsername}`);
+    //there's only ever one emit with the player and the enemy
+    //and it comes from the room creator
+    //what if i just send over an array of both of the objects and have the client choose which one it'll rock with
+    //bc the client has access to loadPlayer and its own account id, so if i just give it both entities and ask it to pick which one it's not
+    //that would just work right
+    const accounts = [
+        {id: player, username: username},
+        {id: enemy, username: enemy},
+    ]
+    io.to(roomName).emit('ready', accounts);
 }
 //leave a room when we want to leave a room
 //(this leaves every room except their personal one, because i don't want to implement checking for an individual room)
