@@ -142,6 +142,7 @@ function MainGame(props) {
     //this has to run though.
     //COME ON JUST RUNNNNN PLEASE
     socket.emit('game time');
+    useEffect(() => {
         async function loadPlayer() {
             const response = await fetch('/players');
             const data = response.json();
@@ -160,6 +161,7 @@ function MainGame(props) {
             await loadOpponent(enem);
             console.log("did YOU run?")
         })
+    }, [props.updatePlayers])
 
     props.reload();
     //i have the other socket holding the other account (and therefore the other player) in io
