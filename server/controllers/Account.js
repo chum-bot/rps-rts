@@ -89,7 +89,7 @@ async function getCurrentAccount(req, res) {
     try{
         const acc = req.query.accountId || req.session.account._id
         const query = {_id: acc}
-        const docs = await Account.find(query).select('username wins losses trophies _id').lean().exec();
+        const docs = await Account.findOne(query).select('username wins losses trophies _id').lean().exec();
 
         return res.status(200).json(docs);
     }

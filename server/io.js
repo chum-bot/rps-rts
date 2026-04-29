@@ -7,7 +7,7 @@ let io;
 function handleRoomCreation(roomName, account, socket){
     socket.join(roomName); //should be more random or code-based or something, does not matter at all for now i just want functionality
     socket.data.account = account;
-    io.to(roomName).emit('created', roomName, socket.data.account[0]);
+    io.to(roomName).emit('created', roomName, socket.data.account);
 }
 
 //if the room name they entered exists let em join it
@@ -48,7 +48,7 @@ async function handleRoomJoin(roomName, account, socket){
         let socketAccs = [];
         for(const soc of roomToJoin) {
             const fullSocInstance = await io.in(soc).fetchSockets(); //getting the full socket instance from the id
-            socketAccs.push(fullSocInstance[0].data.account[0]);
+            socketAccs.push(fullSocInstance[0].data.account);
         }
         io.to(roomName).emit('joined', roomName, socketAccs);
     }
@@ -78,8 +78,8 @@ async function checkRoomReadiness(socket, roomName, player, username) {
     for (const soc of roomToCheck){
         if (soc === socket) return;
         const fullSocInstance = await io.in(soc).fetchSockets();
-        enemy = fullSocInstance[0].data.account[0]._id;
-        enemyUsername = fullSocInstance[0].data.account[0].username;
+        enemy = fullSocInstance[0].data.account._id;
+        enemyUsername = fullSocInstance[0].data.account.username;
     }
     io.to(roomName).emit('ready', player, username, enemy, enemyUsername);
 }

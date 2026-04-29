@@ -74,7 +74,7 @@ async function startGame(e, roomName){
     //i GET the current account
     const account = await helper.getAccount();
     //i then call a POST to createPlayer, they send that back and i work with that for the games themselves
-    await helper.sendPost('/players', {account: account[0]._id});
+    await helper.sendPost('/players', {account: account._id});
 
     //i get the player that was just made to send it back
     const player = await fetch('/players'); 
@@ -83,7 +83,7 @@ async function startGame(e, roomName){
     //which then means the Game can get the player for display
     //let io know a player is ready
     //i'm throughlining the account username too
-    socket.emit('ready', roomName, playerData.player[0], account[0].username);
+    socket.emit('ready', roomName, playerData.player[0], account.username);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -163,7 +163,10 @@ function MainGame(props) {
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(async () => {
         setPlayer(await loadPlayer());
+        console.log(await helper.getAccount().username) //brother how is it undefined. i can literally SEE it RIGHT IN THE OBJECT
+        setPlayerUsername(await helper.getAccount().username)
         setOpponent(await loadOpponent(opponent.account));
+        setOpponentUsername(await helper.getAccount(opponent.account).username)
     }, [props.updatePlayers])
 
     //I GOT IT oh my GOD i hate react
@@ -192,7 +195,8 @@ function MainGame(props) {
                 <p id="opponentRight">🫱 {opponent.right.health}</p>
             </div>
             <form action="/damageHand" method="post">
-                <select name="leftAttack" id="leftAttack">
+            <h2>Left Hand</h2>
+                <select name="leftThrow" id="leftThrow">
                     <option value="rock">👊</option>
                     <option value="paper">🖐️</option>
                     <option value="scissors">✌️</option>
@@ -201,6 +205,17 @@ function MainGame(props) {
                     <option value={opponent.left}>Left</option>
                     <option value={opponent.right}>Right</option>
                 </select>
+            <h2>Right Hand</h2>
+                <select name="rightThrow" id="rightThrow">
+                    <option value="rock">👊</option>
+                    <option value="paper">🖐️</option>
+                    <option value="scissors">✌️</option>
+                </select>
+                <select name="rightTarget" id="rightTarget">
+                    <option value={opponent.left}>Left</option>
+                    <option value={opponent.right}>Right</option>
+                </select>
+                <input type="submit" value="Attack!"/>
             </form>
             <button id="reload" onClick={() => props.reload()}>Reload button for testing</button>
         </div>
