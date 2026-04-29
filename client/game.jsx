@@ -318,7 +318,7 @@ window.onload = init;
 //my grade tanks it i think? but it'll take a giant chunk out of me
 //idk if it'll even be enough for me to make it out of this semester
 //this... extremely, extremely important semester.
-//i'm just stupid i'm just dumb i just hate everything related to success and logic
+//i'm just stupid i'm just dumb i just hate everything related to success and logical progression
 //i'm just not cut out for doing anything, because my time is less important than whatever nonsense i'd waste it on
 //i hate myself i hate these decisions i've made
 //i'm just physically and mentally incapable of doing anything of reasonable value to myself
@@ -330,3 +330,10 @@ window.onload = init;
 //just- whatever. whatever
 //the time has passed, it's over.
 //i don't deserve that hat, whether i get it or not i do not deserve to stand among those others
+//they worked so hard, and what did i do? nothing.
+//yet here i am. 
+//sleep all over my eyes and my face, haven't shaved in months, the heaviest and slowest i've ever been, zero friends made
+//on my last semester here, a year after i should have left, eight hours after the submission deadline for this project
+//likely staring down yet another failure, yet another promise broken, yet another thousands completely and utterly wasted on me
+//wallowing in my own shame and sadness like all the other semesters this happened.
+//why do i even try?
