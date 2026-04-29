@@ -67,8 +67,9 @@ function handleThrow(socket, choice) {
     let enemyChoice;
     socket.rooms.forEach(async room => {
         if(room === socket.id) return;
-        for(const soc of room) {
-            if(soc === socket.id) return;
+        const fullRoom = io.of("/").adapter.rooms.get(room);
+        for(const soc of fullRoom) {
+            if(soc === socket.id) continue;
             const fullSocInstance = await io.in(soc).fetchSockets();
             if(fullSocInstance[0].data.choice){ //if they have a choice, give it to me
                 enemyChoice = fullSocInstance[0].data.choice;
@@ -96,7 +97,6 @@ async function checkRoomReadiness(socket, roomName) {
     //because this is only 
     for(const soc of roomToCheck) {
         const fullSocInstance = await io.in(soc).fetchSockets();
-        console.log(soc);
         if (soc === socket.id) {
             player = fullSocInstance[0].data.account._id;
             username = fullSocInstance[0].data.account.username;
@@ -104,14 +104,12 @@ async function checkRoomReadiness(socket, roomName) {
         else {
             enemy = fullSocInstance[0].data.account._id;
             enemyUsername = fullSocInstance[0].data.account.username;
-            console.log(`my enemy is ${enemyUsername}`)
         }
         if (fullSocInstance[0].data.ready === undefined || fullSocInstance[0].data.ready === false){
             io.to(roomName).emit('not ready');
             return;
         }
     }
-    console.log(`i am ${username} and my enemy is ${enemyUsername}`);
     //there's only ever one emit with the player and the enemy
     //and it comes from the room creator
     //what if i just send over an array of both of the objects and have the client choose which one it'll rock with
@@ -119,7 +117,7 @@ async function checkRoomReadiness(socket, roomName) {
     //that would just work right
     const accounts = [
         {id: player, username: username},
-        {id: enemy, username: enemy},
+        {id: enemy, username: enemyUsername},
     ]
     io.to(roomName).emit('ready', accounts);
 }

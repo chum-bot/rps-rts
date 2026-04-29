@@ -147,10 +147,16 @@ async function loadOpponent(enem) {
 
 //the key here is i need the other user's throw before i run this
 //i can send that through io right, just shing it in and shing it back out?
-async function handleDamage(e, attacker, onDamage) {
+async function handleDamage(e, attacker, defender) {
+    e.preventDefault();
     //the hands themselves
+    console.log(attacker);
+    console.log(defender);
     const leftHand = attacker.left;
     const rightHand = attacker.right;
+    const defenderLeft = defender.left;
+    const defenderRight = defender.right;
+
 
     //the throws of each hand (player)
     const leftThrow = document.querySelector('#leftThrow').value;
@@ -159,7 +165,6 @@ async function handleDamage(e, attacker, onDamage) {
     //the Hands being targeted by the player
     const leftTarget = document.querySelector('#leftTarget').value;
     const rightTarget = document.querySelector('#rightTarget').value;
-
 
     //each request will have an attacker and a defender
     //i already hold the defender's hand in the target object, but i also need their throw
@@ -176,9 +181,33 @@ async function handleDamage(e, attacker, onDamage) {
         const playerThrows = throws[socket.id]; //object indexing should work here bc i listed it by socket
         const keys = Object.keys(throws).filter((ki) => ki !== socket.id)
         const enemyThrows = throws[keys[0]] //...the other one.
-    })
-    //and then pass THAT into the handleDamage
-    //and then update the hands
+        const leftBody = {
+            attacker: {
+                hand: leftHand,
+                throw: leftThrow,
+            },
+            defender: {
+                hand: defender[`${leftTarget}`],
+                throw: enemyThrows.left,
+            }
+        }
+        const leftResolution = await helper.sendPost(e.target.action, leftBody);
+        console.log(leftResolution);
+        const rightBody = {
+            attacker: {
+                hand: rightHand,
+                throw: rightThrow,
+            },
+            defender: {
+                hand: defender[`${rightTarget}`],
+                throw: enemyThrows.right,
+            }
+        }
+        const rightResolution = await helper.sendPost(e.target.action, rightBody);
+        console.log(rightResolution);
+    });
+    //and then update the hands (which should happen automatically, right react?)
+    //wrong! i hate react.
     //and repeat until dead! the loop is coming together finally
 }
 
@@ -186,7 +215,6 @@ async function handleDamage(e, attacker, onDamage) {
 //i really just wanna get the main game working before i look into that
 //and that would still break room functionality bc the original socket is what's joining the room anyway
 function MainGame(props) {
-    const [playerUpdate, setPlayerUpdate] = useState(false); //gonna use this for damage updating
     const [player, setPlayer] = useState(props.player);
     const [opponent, setOpponent] = useState(props.enemy);
     const [playerUsername, setPlayerUsername] = useState(props.username);
@@ -200,10 +228,9 @@ function MainGame(props) {
         setOpponent(await loadOpponent(opponent.account));
         const playAcc = await helper.getAccount();
         const oppAcc = await helper.getAccount(opponent.account);
-        console.log(props.enemy)
         setPlayerUsername(playAcc.username)
         setOpponentUsername(oppAcc.username)
-    }, [props.updatePlayers])
+    }, [props.player, props.enemy]) //helloooooooo, react?
 
     //I GOT IT oh my GOD i hate react
     //ok now i gotta actually deal damage!
@@ -229,7 +256,7 @@ function MainGame(props) {
                 <p id="opponentLeft">🫲 {opponent.left.health}</p>
                 <p id="opponentRight">🫱 {opponent.right.health}</p>
             </div>
-            <form action="/damageHand" method="POST">
+            <form action="/damageHand" method="POST" onSubmit={(e) => handleDamage(e, props.player, props.enemy)}>
             <h2>Left Hand</h2>
                 <select name="leftThrow" id="leftThrow">
                     <option value="rock">👊</option>
@@ -237,8 +264,8 @@ function MainGame(props) {
                     <option value="scissors">✌️</option>
                 </select>
                 <select name="leftTarget" id="leftTarget">
-                    <option value={opponent.left}>Left</option>
-                    <option value={opponent.right}>Right</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
                 </select>
             <h2>Right Hand</h2>
                 <select name="rightThrow" id="rightThrow">
@@ -247,8 +274,8 @@ function MainGame(props) {
                     <option value="scissors">✌️</option>
                 </select>
                 <select name="rightTarget" id="rightTarget">
-                    <option value={opponent.left}>Left</option>
-                    <option value={opponent.right}>Right</option>
+                    <option value='left'>Left</option>
+                    <option value='right'>Right</option>
                 </select>
                 <input type="submit" value="Attack!"/>
             </form>

@@ -25,8 +25,9 @@ const sendPost = async (url, data, handler) => {
   }
 
   if(handler){
-    handler(result);
+    handler();
   }
+  return result;
 };
 
 //to begin a game, i need each user to create a Player for themselves, using the account they're signed into
@@ -44,7 +45,6 @@ async function getAccount(accountId = ''){
         handleError('Error retrieving account');
         return false;
     }
-    console.log(data.username)
     return data;
 }
 

@@ -32,7 +32,6 @@ async function damageHand(req, res) {
             attacker.throw === "scissors" && defender.throw === "paper"
         ){
             defender.hand.health--;
-            defender.hand.save();
             //on the client i can get each individual Player with a fetch (as would be needed by the game itself already)
             //and send back the Hand object they select with the Hand object they target (both Hands are tracked with the Player)
             //that's entirely doable that sounds entirely doable
@@ -44,7 +43,6 @@ async function damageHand(req, res) {
             attacker.throw === "scissors" && defender.throw === "rock"
         ){
             attacker.hand.health--;
-            attacker.hand.save(); //do i even need to do this... i feel like it'd autosave
         }
         else if (attacker.throw === defender.throw) {
             //nothing happens they cancel out
