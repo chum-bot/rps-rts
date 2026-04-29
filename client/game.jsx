@@ -78,10 +78,11 @@ async function startGame(e, roomName){
 
     //i get the player that was just made to send it back
     const player = await fetch('/players'); 
+    const playerData = await player.json();
     //the player now exists for this account
     //which then means the Game can get the player for display
     //let io know a player is ready
-    socket.emit('ready', roomName, player);
+    socket.emit('ready', roomName, playerData.player[0]);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -133,7 +134,6 @@ function Room (props){
 async function loadPlayer() {
     const response = await fetch('/players');
     const data = await response.json();
-    console.log("RUN")
     return data.player[0]; //it gives you an array
 }
 async function loadOpponent(enem) {
@@ -151,16 +151,6 @@ function MainGame(props) {
     const [playerUsername, setPlayerUsername] = useState('');
     const [opponentUsername, setOpponentUsername] = useState('');
 
-    //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
-    //we will have a separate function that calls on the existing damageHand func to deal our damage
-    //this has to run though.
-    useEffect(async () => {
-        setPlayer(await loadPlayer());
-        setPlayerUsername(await helper.getAccount(player.account).username)
-        console.log('testing something?')
-    }, [props.updatePlayers])
-    socket.emit('game time');
-
     //i need this to load instantly
     //but because i'm not loading a new page (i can't bc of socket io room reasons), useEffect doesn't run when i get here
     //so i need to run this instantly ELSEwhere, and then pass it in here
@@ -174,9 +164,21 @@ function MainGame(props) {
     //then on ready (also in the room), i render game in the root
     //i could pass the player created to the ready emit, have io send it back as is, pass it through game as a prop, pass that through maingame as a prop, and then access it via props.player
     //so it takes a throughline across all of my room stuff 
-    console.log(props.player);
-    setPlayer(props.player)
-    setPlayerUsername(props.player.account) //but i need an async to get the username here.
+    setPlayer(props.player);
+    console.log(player); //i hate react
+    console.log(props.layer); //i hate react
+    //brother. i JUST set it. it's INSIDE of the props and EVERYTHING man.
+    //what do you MEAN that you cannot read it.
+    setPlayerUsername(props.player.account)
+    
+    //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
+    //we will have a separate function that calls on the existing damageHand func to deal our damage
+    useEffect(async () => {
+        setPlayer(await loadPlayer());
+        setPlayerUsername(await helper.getAccount(player.account).username)
+    }, [props.updatePlayers])
+    socket.emit('game time');
+
 
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
