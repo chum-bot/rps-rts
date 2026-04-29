@@ -85,6 +85,7 @@ async function startGame(e, roomName){
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
 //show the thingies right there on room join once it has them
 function Room (props){
+    const [playerUpdate, setPlayerUpdate] = useState(false); //using this for initial player load
     //when the room is created/a user joins the room, we want to give back the name
     //and the account that created it, so we can use that in the display and for the players themselves
     let [room, setRoom] = useState('');
@@ -112,7 +113,7 @@ function Room (props){
     //if both players are ready
     socket.on('ready', () => {
         const root = createRoot(document.getElementById('game'));
-        root.render(<Game/>);
+        root.render(<Game/>); //so it updates instantly? i guess? i gotta load in the player
     })
     
     //now we have an array with both accounts
@@ -127,20 +128,39 @@ function Room (props){
     );
 }
 
-async function Game(props) {
+//all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
+//i really just wanna get the main game working before i look into that (activating the reverse cursed technique)
+//and that would still break room functionality bc the original socket is what's joining the room anyway
+function Game(props) {
+    const [playerUpdate, setPlayerUpdate] = useState(false); //gonna use this for damage updating
     const [player, setPlayer] = useState({});
     const [opponent, setOpponent] = useState({});
+    const [playerUsername, setPlayerUsername] = useState('');
+    const [opponentUsername, setOpponentUsername] = useState('');
 
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
+    //this has to run though.
     useEffect(() => {
         async function loadPlayer() {
             const response = await fetch('/players');
             const data = response.json();
             setPlayer(data.player);
+            setPlayerUsername(await helper.getAccount(data.player.account).username)
+        }
+        async function loadOpponent(enem) {
+            const response = await fetch(`/players?accountId=${enem}`)
+            const data = response.json();
+            setOpponent(data.player);
+            setOpponentUsername(await helper.getAccount(data.player.account).username)
         }
         loadPlayer();
-    }, [props.updatePlayer]);
+        console.log("did you run?")
+        socket.on('enemy', async (enem) => {
+            await loadOpponent(enem);
+            console.log("did YOU run?")
+        })
+    }, [props.updatePlayers]);
 
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
@@ -148,14 +168,6 @@ async function Game(props) {
     //and sending back the *other* id (we already have our own id)
     //so we can setOpponent by getting that other player
     socket.emit('game time');
-    socket.on('enemy', async (enem) => {
-        const response = await fetch(`/players?accountId=${enem}`)
-        const data = response.json();
-        setOpponent(data.player);
-    })
-
-    const playerUsername = await helper.getAccount(player.account).username;
-    const opponentUsername = await helper.getAccount(opponent.account).username;
     return (
         <div>
             <h1 id="theGame">This is the Game!</h1>
@@ -181,6 +193,10 @@ function dynamicListener(e, component) {
     e.preventDefault();
     root.render(component);
     return false;
+}
+
+function App() {
+    const 
 }
 
 function init() {

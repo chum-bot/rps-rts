@@ -65,12 +65,11 @@ async function checkRoomReadiness(socket, roomName) {
     const roomToCheck = io.of("/").adapter.rooms.get(roomName);
     for(const soc of roomToCheck) {
         const fullSocInstance = await io.in(soc).fetchSockets();
-        if (fullSocInstance[0].data.ready && fullSocInstance[0].data.ready === false){
+        if (fullSocInstance[0].data.ready === undefined || fullSocInstance[0].data.ready === false){
             io.to(roomName).emit('not ready');
             return;
         }
     }
-    console.log("this never ran which is a little concerning?")
     io.to(roomName).emit('ready');
 }
 
