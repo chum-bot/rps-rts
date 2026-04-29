@@ -60,7 +60,7 @@ async function handleRoomJoin(roomName, account, socket){
     }
 }
 
-async function checkRoomReadiness(socket, roomName, player) {
+async function checkRoomReadiness(socket, roomName, player, username) {
     socket.data.ready = true;
     const roomToCheck = io.of("/").adapter.rooms.get(roomName);
     for(const soc of roomToCheck) {
@@ -70,7 +70,7 @@ async function checkRoomReadiness(socket, roomName, player) {
             return;
         }
     }
-    io.to(roomName).emit('ready', player);
+    io.to(roomName).emit('ready', player, username);
 }
 
 async function giveEnemy(socket) {
@@ -156,7 +156,7 @@ function socketSetup(app) {
 
         socket.on('game time', () => giveEnemy(socket));
 
-        socket.on('ready', (roomName, player) => checkRoomReadiness(socket, roomName, player));
+        socket.on('ready', (roomName, player, username) => checkRoomReadiness(socket, roomName, player, username));
     });
 
     return server;

@@ -82,7 +82,8 @@ async function startGame(e, roomName){
     //the player now exists for this account
     //which then means the Game can get the player for display
     //let io know a player is ready
-    socket.emit('ready', roomName, playerData.player[0]);
+    //i'm throughlining the account username too
+    socket.emit('ready', roomName, playerData.player[0], account[0].username);
 }
 //we'll have io emit the account name of each of the sockets in the room to the room itself
 //i think i have a way to do that? i can have each user emit their account, and then io can just 
@@ -116,7 +117,7 @@ function Room (props){
     //i'm gonna make both player entities here
     socket.on('ready', (player) => {
         const root = createRoot(document.getElementById('game'));
-        root.render(<Game player={player}/>);
+        root.render(<Game player={player} username={username}/>);
     })
     
     //now we have an array with both accounts
@@ -142,43 +143,28 @@ async function loadOpponent(enem) {
     return data.player[0]; //it gives you an array
 }
 //all of these would ideally be different pages and i would have the socket thingy that attaches to account implemented but
-//i really just wanna get the main game working before i look into that (activating the reverse cursed technique)
+//i really just wanna get the main game working before i look into that
 //and that would still break room functionality bc the original socket is what's joining the room anyway
 function MainGame(props) {
     const [playerUpdate, setPlayerUpdate] = useState(false); //gonna use this for damage updating
-    const [player, setPlayer] = useState({});
-    const [opponent, setOpponent] = useState({});
-    const [playerUsername, setPlayerUsername] = useState('');
+    const [player, setPlayer] = useState(props.player);
+    const [opponent, setOpponent] = useState(props.player);
+    const [playerUsername, setPlayerUsername] = useState(props.username);
     const [opponentUsername, setOpponentUsername] = useState('');
 
-    //i need this to load instantly
-    //but because i'm not loading a new page (i can't bc of socket io room reasons), useEffect doesn't run when i get here
-    //so i need to run this instantly ELSEwhere, and then pass it in here
-    //i can't make this MainGame function async to run await loadPlayer here, because then it infinitely loops on me
-    //i essentially have to pass in the initial player and opponent as props
-    //maybe i can do that when i load game on room ready?
-    //and run load player up there? bc i know it'll run over there?
-    //maybe i set it when the socket comes back? but i don't think that's instant tho ideally it exists before the page loads
-    //i think i do both
     //in the startGame function that runs, i create the player and emit ready to the socket
     //then on ready (also in the room), i render game in the root
     //i could pass the player created to the ready emit, have io send it back as is, pass it through game as a prop, pass that through maingame as a prop, and then access it via props.player
     //so it takes a throughline across all of my room stuff 
-    setPlayer(props.player);
-    console.log(player); //i hate react
-    console.log(props.layer); //i hate react
-    //brother. i JUST set it. it's INSIDE of the props and EVERYTHING man.
-    //what do you MEAN that you cannot read it.
-    setPlayerUsername(props.player.account)
     
     //this will update the visual of the player by getting it from the server when their data is changed (damage is taken or something)
     //we will have a separate function that calls on the existing damageHand func to deal our damage
     useEffect(async () => {
         setPlayer(await loadPlayer());
         setPlayerUsername(await helper.getAccount(player.account).username)
+        console.log('is it you?')
     }, [props.updatePlayers])
     socket.emit('game time');
-
 
     //i have the other socket holding the other account (and therefore the other player) in io
     //so i must simply retrieve that account id by getting it from the other socket in the room
@@ -189,9 +175,9 @@ function MainGame(props) {
     socket.on('enemy', async (enem) => {
         setOpponent(await loadOpponent(enem));
         setOpponentUsername(await helper.getAccount(opponent.account).username)
+        console.log('or is it you?')
     })
 
-    if(opponent && player){
     return (
         <div>
             <h1 id="theGame">This is the Game!</h1>
@@ -208,7 +194,6 @@ function MainGame(props) {
             <button id="reload" onClick={props.reload}>Reload button for testing</button>
         </div>
     )
-    }
 }
 
 function dynamicListener(e, component) {
@@ -226,7 +211,7 @@ function Game(props) {
     const [playerUpdate, setPlayerUpdate] = useState(false);
 
     return(
-        <MainGame reload={() => {setPlayerUpdate(!playerUpdate)}} updatePlayers={playerUpdate} player={props.player}/>
+        <MainGame reload={() => {setPlayerUpdate(!playerUpdate)}} updatePlayers={playerUpdate} player={props.player} username={props.username}/>
     )
 }
 
